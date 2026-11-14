@@ -1,116 +1,60 @@
-import React, { useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Stars } from "@react-three/drei";
-import * as THREE from "three";
+import React, { useMemo, useState } from "react";
 import {
+  Activity,
   AlertTriangle,
   BatteryWarning,
   CheckCircle2,
   ChevronRight,
   Cpu,
+  Flame,
+  Gauge,
+  Power,
   Radio,
   Rocket,
-  ShieldAlert,
+  Shield,
   Sparkles,
+  Terminal,
   ThermometerSnowflake,
+  Wind,
+  Zap,
 } from "lucide-react";
 import { DrFarahPortrait } from "./DrFarahAvatar";
-import { Earth } from "./three/SpaceProps";
+import { spaceAudio } from "../utils/sound";
 
-// ---------------------------------------------------------------------------
-// 3D Lunar Horizon Viewed Through the Rocket Cockpit Windows
-// ---------------------------------------------------------------------------
-function CockpitWindowScene({ isSunsetAlert }) {
-  const terrainGeo = useMemo(() => {
-    const geo = new THREE.PlaneGeometry(160, 90, 72, 48);
-    geo.rotateX(-Math.PI / 2);
-    const pos = geo.attributes.position;
-    for (let i = 0; i < pos.count; i++) {
-      const x = pos.getX(i);
-      const z = pos.getZ(i);
-      // Crater basin in mid-ground + ridges in distance
-      const craterDist = Math.hypot(x + 8, z + 18);
-      const craterRim =
-        craterDist < 9
-          ? -Math.cos((craterDist / 9) * Math.PI) * 1.4
-          : Math.sin(x * 0.08) * Math.cos(z * 0.08) * 1.8;
-      const ridge = z < -22 ? Math.pow((-z - 22) * 0.12, 1.5) * 1.6 : 0;
-      pos.setY(i, craterRim + ridge - 3.2);
-    }
-    geo.computeVertexNormals();
-    return geo;
-  }, []);
-
-  const sunLightRef = useRef();
-
-  useFrame(({ clock, scene }) => {
-    const t = clock.getElapsedTime();
-    const targetSky = new THREE.Color(isSunsetAlert ? "#3b130e" : "#050914");
-    if (scene.background instanceof THREE.Color) {
-      scene.background.lerp(targetSky, 0.06);
-    }
-    if (scene.fog) {
-      scene.fog.color.lerp(
-        new THREE.Color(isSunsetAlert ? "#9a3412" : "#0b1329"),
-        0.06
-      );
-    }
-    if (sunLightRef.current) {
-      sunLightRef.current.intensity = isSunsetAlert
-        ? 2.2 + Math.sin(t * 4) * 0.3
-        : 1.4;
-    }
-  });
-
-  return (
-    <>
-      <color attach="background" args={["#050914"]} />
-      <fogExp2 attach="fog" args={["#0b1329", 0.015]} />
-
-      <ambientLight
-        intensity={isSunsetAlert ? 0.45 : 0.55}
-        color={isSunsetAlert ? "#fdba74" : "#cbd5e1"}
-      />
-      <directionalLight
-        ref={sunLightRef}
-        position={isSunsetAlert ? [0, 2, -45] : [18, 22, 10]}
-        color={isSunsetAlert ? "#f97316" : "#f8fafc"}
-        intensity={1.6}
-      />
-
-      <Stars radius={90} depth={40} count={1400} factor={3} fade />
-
-      {/* Earth glowing in the lunar sky */}
-      <Earth radius={3.2} spin={0.04} position={[-14, 9, -38]} />
-
-      {/* Shackleton Crater terrain outside the window */}
-      <mesh geometry={terrainGeo} position={[0, 0, -18]}>
-        <meshStandardMaterial
-          color={isSunsetAlert ? "#8c4a32" : "#64748b"}
-          roughness={0.92}
-          metalness={0.08}
-          flatShading
-        />
-      </mesh>
-    </>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Interactive Rocket Cockpit Power Control System Situational Task
-// ---------------------------------------------------------------------------
 export default function LunarCockpitTask({ t, onCompleteCockpitTask, onPlaySfx }) {
-  // Steps: "stable" -> "alert" -> "chilly" -> "choice" -> "outcomeA" | "outcomeB"
+  // Narrative steps: "stable" -> "alert" -> "chilly" -> "choice" -> "outcomeA" | "outcomeB"
   const [step, setStep] = useState("stable");
   const [chosenOption, setChosenOption] = useState(null);
-  const [hoveredOption, setHoveredOption] = useState(null); // "A" | "B" | null
+  const [hoveredOption, setHoveredOption] = useState(null);
+
+  // Interactive Spaceship Terminal States (Clickable Monitors, Switches & Nodes)
+  const [mainTab, setMainTab] = useState("SYSTEM"); // "SYSTEM" | "ACTIVITY" | "LOG"
+  const [pieMode, setPieMode] = useState(0);
+  const [ecgBoost, setEcgBoost] = useState(false);
+  const [thermalView, setThermalView] = useState("EXT"); // "EXT" | "CABIN"
+  const [schematicNodes, setSchematicNodes] = useState({
+    core: true,
+    heaters: true,
+    o2: true,
+    shields: true,
+  });
+  const [keypadSwitches, setKeypadSwitches] = useState({
+    aux: true,
+    heaters: false,
+    o2: true,
+    shield: true,
+    radar: true,
+    deice: false,
+  });
+  const [terminalLog, setTerminalLog] = useState(
+    "SYS-OK // SHACKLETON LANDER TERMINAL READY — CLICK ANY SCREEN OR SWITCH"
+  );
 
   const ct = t.cockpitTask;
   const isSunsetAlert = step === "alert" || step === "chilly" || step === "choice";
   const isChilly = step === "chilly" || step === "choice";
   const isOutcome = step === "outcomeA" || step === "outcomeB";
 
-  // Resource percentages shown in the Top-Right 4 Resources panel
   const displayedStats = useMemo(() => {
     if (step === "outcomeA") {
       return { power: 85, oxygen: 90, shielding: 90, food: 100 };
@@ -121,7 +65,6 @@ export default function LunarCockpitTask({ t, onCompleteCockpitTask, onPlaySfx }
     return { power: 100, oxygen: 100, shielding: 100, food: 100 };
   }, [step]);
 
-  // Preview deltas when hovering Choice A or Choice B
   const previewStats = useMemo(() => {
     if (step !== "choice" || !hoveredOption) return null;
     if (hoveredOption === "A") {
@@ -130,15 +73,22 @@ export default function LunarCockpitTask({ t, onCompleteCockpitTask, onPlaySfx }
     return { power: 70, oxygen: 100, shielding: 100, food: 85 };
   }, [step, hoveredOption]);
 
+  const playBeep = (freq = 620) => {
+    spaceAudio.playTone(freq, 0.08, "sine", 0.1);
+  };
+
   const handleNext = () => {
     onPlaySfx?.("click");
     if (step === "stable") {
       onPlaySfx?.("alert");
       setStep("alert");
+      setTerminalLog("WARN // SUNSET APPROACHING SHACKLETON CRATER — SOLAR INPUT DROPPING!");
     } else if (step === "alert") {
       setStep("chilly");
+      setTerminalLog("TEMP ALERT // EXTERIOR PLUNGING TO -130°C — RESERVE DECISION REQUIRED");
     } else if (step === "chilly") {
       setStep("choice");
+      setTerminalLog("AWAITING COMMAND // SELECT POWER ALLOCATION PROTOCOL A OR B");
     }
   };
 
@@ -148,15 +98,39 @@ export default function LunarCockpitTask({ t, onCompleteCockpitTask, onPlaySfx }
     if (opt === "A") {
       onPlaySfx?.("success");
       setStep("outcomeA");
+      setTerminalLog("PROTOCOL A LOCKED // HEATERS & LIFE SUPPORT BALANCED (PWR 85%)");
     } else {
       onPlaySfx?.("alert");
       setStep("outcomeB");
+      setTerminalLog("PROTOCOL B LOCKED // FULL HEATERS ENGAGED (PWR 70%, FOOD 85%)");
     }
   };
 
   const handleExitToBase = () => {
     onPlaySfx?.("success");
     onCompleteCockpitTask(chosenOption || "A");
+  };
+
+  const toggleKeypad = (key, label, freq) => {
+    playBeep(freq);
+    setKeypadSwitches((prev) => {
+      const nextVal = !prev[key];
+      setTerminalLog(
+        `CONSOLE SWITCH // [${label}] -> ${nextVal ? "ENGAGED (ONLINE)" : "STANDBY"}`
+      );
+      return { ...prev, [key]: nextVal };
+    });
+  };
+
+  const toggleSchematicNode = (key, label, freq) => {
+    playBeep(freq);
+    setSchematicNodes((prev) => {
+      const nextVal = !prev[key];
+      setTerminalLog(
+        `GRID BUS // NODE [${label}] -> ${nextVal ? "ROUTING 100%" : "BYPASSED"}`
+      );
+      return { ...prev, [key]: nextVal };
+    });
   };
 
   const currentDialogue =
@@ -178,240 +152,373 @@ export default function LunarCockpitTask({ t, onCompleteCockpitTask, onPlaySfx }
   ];
 
   return (
-    <div className="fixed inset-0 z-40 bg-slate-950 overflow-hidden select-none flex flex-col justify-between">
-      {/* 1. Live 3D Lunar Crater & Sunset Window Viewport */}
+    <div className="fixed inset-0 z-40 bg-slate-950 overflow-hidden select-none">
+      {/* 1. Spaceship Cockpit Interior Concept Backdrop */}
       <div className="fixed inset-0 z-0">
-        <Canvas camera={{ position: [0, 1.5, 6], fov: 50 }}>
-          <CockpitWindowScene isSunsetAlert={isSunsetAlert} />
-        </Canvas>
-        {/* Sunset horizon atmospheric glow */}
+        <img
+          src="/cockpit-interior.png"
+          alt="Spaceship Cockpit Interior"
+          className="w-full h-full object-cover object-center"
+        />
+        {/* Dynamic Sunset / Red Alert Lighting Tint over the Cockpit & Window */}
         <div
-          className={`pointer-events-none absolute inset-0 transition-opacity duration-700 ${
+          className={`pointer-events-none absolute inset-0 transition-all duration-700 ${
             isSunsetAlert
-              ? "opacity-100 bg-gradient-to-t from-orange-600/35 via-amber-500/10 to-transparent"
-              : "opacity-0"
+              ? "bg-gradient-to-tr from-rose-950/45 via-orange-600/25 to-amber-500/20"
+              : "bg-slate-950/10"
           }`}
         />
       </div>
 
-      {/* 2. SVG Spacecraft Cockpit Structural Canopy & Frame Overlay */}
-      <svg
-        className="pointer-events-none fixed inset-0 z-10 w-full h-full"
-        viewBox="0 0 1600 900"
-        preserveAspectRatio="none"
-      >
-        {/* Upper & side metallic canopy ribs */}
-        <path
-          d="M0,0 L1600,0 L1600,110 C1250,45 950,35 650,90 L560,560 L0,620 Z"
-          fill="rgba(15, 23, 42, 0.88)"
-          stroke="rgba(148, 163, 184, 0.25)"
-          strokeWidth="3"
-        />
-        {/* Curved window mullions */}
-        <path
-          d="M660,70 C740,240 760,420 740,600"
-          fill="none"
-          stroke="rgba(51, 65, 85, 0.9)"
-          strokeWidth="22"
-        />
-        <path
-          d="M1040,52 C1000,240 990,420 1010,600"
-          fill="none"
-          stroke="rgba(51, 65, 85, 0.9)"
-          strokeWidth="26"
-        />
-        {/* Lower dashboard console */}
-        <path
-          d="M0,580 L640,545 C920,515 1280,520 1600,565 L1600,900 L0,900 Z"
-          fill="rgba(15, 23, 42, 0.95)"
-          stroke="rgba(100, 116, 139, 0.4)"
-          strokeWidth="4"
-        />
-      </svg>
-
-      {/* 3. Top Cockpit Header Bar */}
-      <div className="relative z-20 flex flex-wrap items-center justify-between gap-3 px-4 sm:px-8 pt-4 sm:pt-5">
-        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-900/90 border border-cyan-400/40 shadow-lg">
+      {/* 2. Top Header Bar & Live Terminal Ticker */}
+      <div className="relative z-20 flex flex-wrap items-center justify-between gap-2 px-4 sm:px-7 pt-3 sm:pt-4 pointer-events-none">
+        <div className="pointer-events-auto flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-950/90 border border-cyan-400/50 shadow-lg backdrop-blur-md">
           <Cpu className="w-4 h-4 text-cyan-400" />
           <span className="font-display text-xs sm:text-sm font-bold tracking-wider uppercase text-cyan-200">
-            {ct.badge}
+            🌕 {ct.badge}
           </span>
         </div>
 
         <div className="flex flex-col items-center">
-          <div className="font-display text-sm sm:text-lg font-bold tracking-[0.2em] uppercase text-slate-200">
+          <div className="px-4 py-1 rounded-full bg-slate-950/85 border border-white/15 font-display text-xs sm:text-base font-bold tracking-[0.18em] uppercase text-slate-100 shadow-lg">
             {ct.systemTitle}
           </div>
           {isSunsetAlert && (
-            <div className="mt-1 flex items-center gap-2 px-4 py-1 rounded-full bg-orange-500/20 border border-orange-400/70 text-orange-300 font-display text-base sm:text-2xl font-extrabold tracking-widest uppercase shadow-[0_0_25px_rgba(249,115,22,0.5)] animate-pulse">
-              <AlertTriangle className="w-5 h-5 text-orange-400" />
+            <div className="mt-1 flex items-center gap-2 px-4 py-1 rounded-full bg-rose-950/90 border-2 border-orange-400 text-orange-300 font-display text-sm sm:text-xl font-extrabold tracking-widest uppercase shadow-[0_0_25px_rgba(249,115,22,0.65)] animate-pulse">
+              <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400" />
               <span>{ct.alertTitle}</span>
             </div>
           )}
         </div>
 
-        <div className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-900/90 border border-white/15 text-xs font-mono text-slate-300">
-          <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
-          <span>TELEMETRY ONLINE</span>
+        {/* Live Terminal Command Log Pill */}
+        <div className="pointer-events-auto hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-950/90 border border-emerald-400/40 text-[11px] font-mono text-emerald-300 shadow-lg max-w-md truncate">
+          <Terminal className="w-3.5 h-3.5 text-emerald-400 shrink-0 animate-pulse" />
+          <span className="truncate">{terminalLog}</span>
         </div>
       </div>
 
-      {/* 4. Middle Section: Left Cockpit Tactical Monitor + Right 4 Resources Gauge Card */}
-      <div className="relative z-20 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 px-4 sm:px-8 py-2 items-center">
-        {/* Left Primary Cockpit Tactical Screen (Cols 1-5) */}
-        <div className="lg:col-span-5 bg-slate-950/90 border-2 border-slate-600/80 rounded-3xl p-4 sm:p-5 shadow-[inset_0_0_40px_rgba(0,0,0,0.85)] relative overflow-hidden">
-          {/* Monitor Top Telemetry Readout */}
-          <div className="flex items-center justify-between text-[11px] font-mono text-cyan-300/90 border-b border-white/10 pb-2 mb-3">
-            <div>
-              <div>OXYGEN LEVEL: {displayedStats.oxygen}%</div>
-              <div>SEISMIC ACTIVITY: LOW</div>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded bg-cyan-500/15 border border-cyan-400/40 text-cyan-200">
-                EXT TEMP: {isSunsetAlert ? "-130°C" : "-25°C"}
-              </span>
-            </div>
+      {/* =================================================================== */}
+      {/* 3. CLICKABLE SPACESHIP TERMINAL SCREENS & CONSOLE BUTTON HOTSPOTS   */}
+      {/* =================================================================== */}
+
+      {/* A. Top-Left Main Tactical Monitor Overlay (Interactive Tabs & Sunset Alert) */}
+      <div className="fixed left-[3%] top-[10%] w-[35%] h-[44%] z-20 hidden sm:flex flex-col justify-between p-3 rounded-2xl bg-slate-950/45 hover:bg-slate-950/65 backdrop-blur-[1px] border border-cyan-400/35 hover:border-cyan-300 transition shadow-[inset_0_0_30px_rgba(6,182,212,0.2)]">
+        {/* Top Screen Telemetry Header */}
+        <div className="flex items-start justify-between text-[11px] font-mono text-cyan-200">
+          <div className="bg-slate-950/75 px-2.5 py-1 rounded-lg border border-cyan-400/30">
+            <div>OXYGEN LEVEL: {displayedStats.oxygen}%</div>
+            <div>SEISMIC ACTIVITY: LOW</div>
           </div>
-
-          {/* Monitor Screen Body */}
-          {isSunsetAlert ? (
-            <div className="p-4 rounded-2xl bg-gradient-to-b from-rose-950/90 to-slate-950/95 border-2 border-rose-500/80 text-center shadow-[0_0_30px_rgba(244,63,94,0.45)]">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-rose-500/20 border border-rose-400/60 text-rose-300 font-mono text-xs font-extrabold mb-2">
-                <BatteryWarning className="w-4 h-4 text-rose-400 animate-bounce" />
-                <span>CRITICAL BATTERY: 4%</span>
-              </div>
-
-              <div className="my-2 flex justify-center">
-                <div className="w-14 h-14 rounded-2xl bg-rose-500/20 border-2 border-rose-400 flex items-center justify-center animate-pulse">
-                  <AlertTriangle className="w-9 h-9 text-rose-400" />
-                </div>
-              </div>
-
-              <div className="font-display text-base sm:text-lg font-extrabold tracking-wide text-rose-200 uppercase">
-                WARNING: SUNSET APPROACHING
-              </div>
-              <div className="text-xs font-bold text-orange-300 uppercase tracking-wider mb-2">
-                SHACKLETON CRATER
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-rose-950/90 border border-rose-400/50 text-[11px] sm:text-xs font-bold text-rose-100 uppercase tracking-wide">
-                Power reserves dangerously low • Manage reserve heaters & life support immediately
-              </div>
-            </div>
-          ) : (
-            <div className="p-4 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950 border border-emerald-400/40 text-center">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 text-xs font-extrabold uppercase mb-3">
-                <CheckCircle2 className="w-4 h-4" />
-                <span>LUNAR BASE ALPHA • SYSTEMS STABLE</span>
-              </div>
-
-              {/* Stylized Crater & Rover Radar Graphic */}
-              <div className="relative h-28 rounded-xl bg-slate-900/90 border border-cyan-500/25 flex items-center justify-center overflow-hidden mb-3">
-                <div className="w-24 h-24 rounded-full border border-emerald-400/30 flex items-center justify-center">
-                  <div className="w-14 h-14 rounded-full border border-emerald-400/50 flex items-center justify-center">
-                    <div className="w-3 h-3 rounded-full bg-emerald-400 animate-ping" />
-                  </div>
-                </div>
-                <div className="absolute bottom-2 left-3 text-[10px] font-mono text-emerald-300">
-                  SHACKLETON RIM SECTOR 01
-                </div>
-                <div className="absolute top-2 right-3 text-[10px] font-mono text-cyan-300">
-                  GRID LOCK: OK
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 text-[11px] font-mono">
-                <div className="p-1.5 rounded bg-slate-800/80 text-emerald-300">
-                  PWR: {displayedStats.power}%
-                </div>
-                <div className="p-1.5 rounded bg-slate-800/80 text-cyan-300">
-                  O₂: {displayedStats.oxygen}%
-                </div>
-                <div className="p-1.5 rounded bg-slate-800/80 text-indigo-300">
-                  SHD: {displayedStats.shielding}%
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Lower Sub-Monitors (Pie / Waveform / Bars) */}
-          <div className="grid grid-cols-3 gap-2.5 mt-3">
-            <div className="p-2.5 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col justify-between">
-              <span className="text-[10px] font-mono text-slate-400">CELL LOAD</span>
-              <div className="flex items-end gap-1 h-8 mt-1">
-                {[65, 85, 45, 90, 70].map((h, i) => (
-                  <div
-                    key={i}
-                    className={`flex-1 rounded-t ${
-                      isSunsetAlert ? "bg-rose-400" : "bg-cyan-400"
-                    }`}
-                    style={{ height: `${h}%` }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="p-2.5 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col justify-between">
-              <span className="text-[10px] font-mono text-slate-400">THERMAL</span>
-              <div className="flex items-center justify-center h-8 text-xs font-mono font-bold text-amber-300">
-                <ThermometerSnowflake className="w-4 h-4 mr-1 text-sky-300" />
-                {isSunsetAlert ? "-130°C" : "21°C"}
-              </div>
-            </div>
-
-            <div className="p-2.5 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col justify-between">
-              <span className="text-[10px] font-mono text-slate-400">GRID STATUS</span>
-              <div
-                className={`text-xs font-mono font-extrabold mt-2 ${
-                  isSunsetAlert ? "text-rose-400 animate-pulse" : "text-emerald-400"
-                }`}
-              >
-                {isSunsetAlert ? "ALERT" : "NOMINAL"}
-              </div>
-            </div>
+          <div className="flex items-center gap-1.5 bg-slate-950/75 px-2.5 py-1 rounded-lg border border-cyan-400/30">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <span>GRID: {mainTab}</span>
           </div>
         </div>
 
-        {/* Center Viewport Spacer (Cols 6-8) */}
-        <div className="hidden lg:block lg:col-span-3" />
+        {/* Center Screen Content (Changes based on Alert State or Selected Tab) */}
+        <div className="my-auto mx-auto w-full max-w-sm">
+          {isSunsetAlert && mainTab === "SYSTEM" ? (
+            <button
+              type="button"
+              onClick={() => {
+                playBeep(440);
+                setStep("choice");
+                setTerminalLog("TERMINAL OVERRIDE // OPENING POWER RESERVE ALLOCATION");
+              }}
+              className="w-full p-3 rounded-2xl bg-rose-950/90 hover:bg-rose-900/95 border-2 border-rose-500 text-center shadow-[0_0_30px_rgba(244,63,94,0.6)] transition group"
+            >
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-rose-500/30 text-rose-200 font-mono text-[10px] font-bold mb-1">
+                <BatteryWarning className="w-3.5 h-3.5 text-rose-300 animate-bounce" />
+                <span>CRITICAL BATTERY: 4%</span>
+              </div>
+              <div className="font-display text-sm md:text-base font-extrabold text-white uppercase tracking-wide">
+                ⚠️ WARNING: SUNSET APPROACHING
+              </div>
+              <div className="text-[11px] font-bold text-orange-300 uppercase">
+                SHACKLETON CRATER • -130°C
+              </div>
+              <div className="mt-1.5 inline-block px-3 py-1 rounded-full bg-amber-400 text-slate-950 font-extrabold text-[10px] uppercase tracking-wider group-hover:scale-105 transition">
+                Click Screen to Manage Reserves →
+              </div>
+            </button>
+          ) : mainTab === "ACTIVITY" ? (
+            <div className="p-3 rounded-xl bg-slate-950/85 border border-cyan-400/50 text-xs font-mono text-cyan-200">
+              <div className="font-bold text-cyan-300 mb-1">
+                📡 SHACKLETON SURFACE ROVERS: 4 ACTIVE
+              </div>
+              <div>• SOLAR ARRAY PEAK: {isSunsetAlert ? "12% (SHADOW)" : "98% (OPTIMAL)"}</div>
+              <div>• HABITAT DOME SEAL: 100% PRESSURIZED</div>
+              <div>• REGOLITH O₂ EXTRACTOR: STANDBY</div>
+            </div>
+          ) : mainTab === "LOG" ? (
+            <div className="p-3 rounded-xl bg-slate-950/85 border border-amber-400/50 text-xs font-mono text-amber-200">
+              <div className="font-bold text-amber-300 mb-1">📋 FLIGHT RECORDER LOG</div>
+              <div>00:01 — TOUCHDOWN AT SHACKLETON RIM</div>
+              <div>00:02 — POWER CONTROL SYSTEM ONLINE</div>
+              <div>00:03 — {terminalLog}</div>
+            </div>
+          ) : (
+            <div className="p-2.5 rounded-xl bg-slate-950/70 border border-emerald-400/40 text-center">
+              <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-emerald-300">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>SHACKLETON OUTPOST CAM • LIVE FEED</span>
+              </div>
+            </div>
+          )}
+        </div>
 
-        {/* Right 4 Resources Panel (Cols 9-12) */}
-        <div className="lg:col-span-4 lg:justify-self-end w-full max-w-sm bg-slate-900/85 backdrop-blur-md border border-white/20 rounded-3xl p-4 sm:p-5 shadow-2xl">
-          <div className="text-xs font-extrabold uppercase tracking-widest text-slate-300 mb-3">
-            4 RESOURCES
+        {/* Bottom Screen Clickable Mode Buttons (Matching the 3 buttons on the monitor frame) */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            {["SYSTEM", "ACTIVITY", "LOG"].map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => {
+                  playBeep(720);
+                  setMainTab(tab);
+                  setTerminalLog(`MAIN MONITOR // VIEW SWITCHED TO [${tab}]`);
+                }}
+                className={`px-2.5 py-1 rounded text-[10px] font-mono font-extrabold uppercase border transition ${
+                  mainTab === tab
+                    ? "bg-cyan-400 text-slate-950 border-white shadow-[0_0_12px_rgba(34,211,238,0.8)]"
+                    : "bg-slate-900/85 hover:bg-slate-800 text-cyan-200 border-cyan-400/40"
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
           </div>
-          <div className="flex flex-col gap-3">
-            {resourceRows.map((r) => {
-              const currentVal = displayedStats[r.key];
-              const previewVal = previewStats ? previewStats[r.key] : null;
-              const shownVal = previewVal !== null ? previewVal : currentVal;
-              const isDropping = previewVal !== null && previewVal < currentVal;
+          <span className="text-[10px] font-mono text-cyan-300/80 hidden md:inline">
+            CLICK TABS
+          </span>
+        </div>
+      </div>
 
-              return (
-                <div key={r.key}>
-                  <div className="flex items-center justify-between text-xs sm:text-sm font-extrabold mb-1">
-                    <span className="text-white tracking-wide">{r.label}</span>
-                    <span className={isDropping ? "text-rose-400 animate-pulse" : r.textColor}>
-                      {shownVal}%
-                      {isDropping && (
-                        <span className="ml-1 text-[11px] text-rose-300">
-                          ({shownVal - currentVal}%)
-                        </span>
-                      )}
-                    </span>
-                  </div>
-                  <div className="w-full h-3 rounded-full bg-slate-800 overflow-hidden p-0.5">
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        isDropping ? "bg-rose-400" : r.barColor
-                      }`}
-                      style={{ width: `${shownVal}%` }}
-                    />
-                  </div>
+      {/* B. 3 Clickable Sub-Monitors Below Main Screen */}
+      <div className="fixed left-[3%] top-[56%] w-[36%] h-[15%] z-20 hidden sm:grid grid-cols-3 gap-2.5">
+        {/* Sub-Monitor 1: Cell Load Pie/Bars */}
+        <button
+          type="button"
+          onClick={() => {
+            playBeep(520);
+            setPieMode((m) => (m + 1) % 3);
+            setTerminalLog("SUB-MON 01 // CYCLING BATTERY CELL DISTRIBUTION");
+          }}
+          className="p-2 rounded-xl bg-slate-950/75 hover:bg-slate-900/90 border border-emerald-400/45 hover:border-emerald-300 flex flex-col justify-between text-left transition group shadow-lg"
+        >
+          <div className="flex items-center justify-between w-full text-[10px] font-mono font-bold text-emerald-300">
+            <span>CELL BUS #{pieMode + 1}</span>
+            <Gauge className="w-3.5 h-3.5 group-hover:rotate-45 transition" />
+          </div>
+          <div className="flex items-end gap-1 h-9 w-full mt-1">
+            {[
+              [70, 90, 55, 85],
+              [95, 60, 80, 45],
+              [60, 75, 95, 70],
+            ][pieMode].map((h, i) => (
+              <div
+                key={i}
+                className="flex-1 rounded-t bg-gradient-to-t from-emerald-500 to-cyan-300 transition-all duration-300"
+                style={{ height: `${h}%` }}
+              />
+            ))}
+          </div>
+          <span className="text-[9px] font-mono text-slate-400">CLICK TO CYCLE</span>
+        </button>
+
+        {/* Sub-Monitor 2: Life Support & Crew Vitals Waveform */}
+        <button
+          type="button"
+          onClick={() => {
+            playBeep(660);
+            setEcgBoost((b) => !b);
+            setTerminalLog(
+              `SUB-MON 02 // O₂ SCRUBBER PUMP ${!ecgBoost ? "TURBO (98%)" : "NOMINAL"}`
+            );
+          }}
+          className="p-2 rounded-xl bg-slate-950/75 hover:bg-slate-900/90 border border-amber-400/45 hover:border-amber-300 flex flex-col justify-between text-left transition group shadow-lg"
+        >
+          <div className="flex items-center justify-between w-full text-[10px] font-mono font-bold text-amber-300">
+            <span>O₂ VITALS</span>
+            <Activity className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
+          </div>
+          <div className="my-auto w-full px-1.5 py-1 rounded bg-rose-500/20 border border-rose-400/40 text-[11px] font-mono font-extrabold text-rose-200 text-center">
+            {ecgBoost ? "⚡ FLOW: BOOST" : "♥ BPM: 76 NOMINAL"}
+          </div>
+          <span className="text-[9px] font-mono text-slate-400">CLICK TO PULSE</span>
+        </button>
+
+        {/* Sub-Monitor 3: Thermal Curve */}
+        <button
+          type="button"
+          onClick={() => {
+            playBeep(580);
+            setThermalView((v) => (v === "EXT" ? "CABIN" : "EXT"));
+            setTerminalLog("SUB-MON 03 // TOGGLED THERMAL SENSOR CURVE");
+          }}
+          className="p-2 rounded-xl bg-slate-950/75 hover:bg-slate-900/90 border border-sky-400/45 hover:border-sky-300 flex flex-col justify-between text-left transition group shadow-lg"
+        >
+          <div className="flex items-center justify-between w-full text-[10px] font-mono font-bold text-sky-300">
+            <span>THERM: {thermalView}</span>
+            <ThermometerSnowflake className="w-3.5 h-3.5" />
+          </div>
+          <div className="my-auto text-center font-mono text-sm font-extrabold text-white">
+            {thermalView === "EXT"
+              ? isSunsetAlert
+                ? "-130°C"
+                : "-25°C"
+              : "+21.5°C"}
+          </div>
+          <span className="text-[9px] font-mono text-slate-400">CLICK SENSOR</span>
+        </button>
+      </div>
+
+      {/* C. Center Diagnostic Screen Overlay (Above Astronaut's Right Hand) */}
+      <div className="fixed left-[39.8%] top-[51%] w-[13%] h-[18%] z-20 hidden lg:flex flex-col justify-between p-2.5 rounded-xl bg-slate-950/75 hover:bg-slate-900/90 border border-orange-400/50 transition shadow-lg">
+        <div className="flex items-center justify-between text-[9px] font-mono font-bold text-orange-300">
+          <span>POWER BUS</span>
+          <span className="px-1.5 py-0.5 rounded bg-orange-500/20 text-orange-200">
+            {isSunsetAlert ? "ALERT" : "OK"}
+          </span>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            playBeep(780);
+            if (step !== "outcomeA" && step !== "outcomeB") {
+              setStep("choice");
+              setTerminalLog("DIAGNOSTIC SCREEN // OPENED POWER CONTROL DECISION");
+            }
+          }}
+          className="my-auto py-1.5 px-2 rounded-lg bg-gradient-to-r from-orange-500/30 to-amber-500/30 hover:from-orange-500/50 hover:to-amber-500/50 border border-orange-400/60 text-[10px] font-mono font-extrabold text-amber-200 text-center transition"
+        >
+          {isOutcome ? "✓ BUS LOCKED" : "⚡ CALIBRATE RESERVE"}
+        </button>
+
+        <div className="text-[8px] font-mono text-slate-400 text-center">
+          ROVER & BASE LINK
+        </div>
+      </div>
+
+      {/* D. Right Cyan Schematic Terminal Overlay (Interactive Power Grid Nodes) */}
+      <div className="fixed right-[5.5%] top-[53%] w-[27%] h-[25%] z-20 hidden lg:flex flex-col justify-between p-3.5 rounded-2xl bg-slate-950/65 backdrop-blur-[1px] border border-cyan-400/45 shadow-[inset_0_0_25px_rgba(34,211,238,0.2)]">
+        <div className="flex items-center justify-between text-[10px] font-mono font-bold text-cyan-300 border-b border-cyan-400/25 pb-1.5">
+          <span>SHIP POWER SCHEMATIC // CLICK NODES</span>
+          <span className="text-emerald-300">
+            {Object.values(schematicNodes).filter(Boolean).length}/4 ONLINE
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 my-auto">
+          {[
+            { key: "core", label: "REACTOR CORE", icon: Zap, freq: 520 },
+            { key: "heaters", label: "THERMAL LOOP", icon: Flame, freq: 580 },
+            { key: "o2", label: "O₂ LIFE SUPPORT", icon: Wind, freq: 640 },
+            { key: "shields", label: "DOME SHIELDS", icon: Shield, freq: 700 },
+          ].map(({ key, label, icon: Icon, freq }) => {
+            const active = schematicNodes[key];
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => toggleSchematicNode(key, label, freq)}
+                className={`flex items-center justify-between p-2 rounded-xl border font-mono text-[10px] font-bold transition ${
+                  active
+                    ? "bg-cyan-500/20 border-cyan-300 text-cyan-100 shadow-[0_0_12px_rgba(34,211,238,0.35)]"
+                    : "bg-slate-900/80 border-slate-700 text-slate-400"
+                }`}
+              >
+                <span className="flex items-center gap-1.5 truncate">
+                  <Icon className={`w-3.5 h-3.5 ${active ? "text-cyan-300" : "text-slate-500"}`} />
+                  <span className="truncate">{label}</span>
+                </span>
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    active ? "bg-emerald-400 shadow-[0_0_6px_#34d399]" : "bg-rose-500"
+                  }`}
+                />
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="text-[9px] font-mono text-cyan-300/75 flex justify-between">
+          <span>BUS VOLTAGE: 120.4V</span>
+          <span>LOAD: {displayedStats.power}%</span>
+        </div>
+      </div>
+
+      {/* E. Lower Tactile Console Push-Buttons (Clickable Hardware Keypad Strip) */}
+      <div className="fixed left-[12%] bottom-[17%] z-20 hidden md:flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-slate-950/85 border border-slate-600/80 shadow-2xl backdrop-blur-md">
+        <span className="text-[9px] font-mono font-bold text-slate-400 mr-1 uppercase">
+          CONSOLE:
+        </span>
+        {[
+          { key: "aux", label: "AUX PWR", freq: 480, color: "emerald" },
+          { key: "heaters", label: "HEATERS", freq: 540, color: "amber" },
+          { key: "o2", label: "O₂ FLOW", freq: 600, color: "cyan" },
+          { key: "shield", label: "SHIELD", freq: 660, color: "indigo" },
+          { key: "radar", label: "RADAR", freq: 720, color: "emerald" },
+          { key: "deice", label: "DE-ICE", freq: 780, color: "amber" },
+        ].map((btn) => {
+          const on = keypadSwitches[btn.key];
+          return (
+            <button
+              key={btn.key}
+              type="button"
+              onClick={() => toggleKeypad(btn.key, btn.label, btn.freq)}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border font-mono text-[10px] font-extrabold transition active:scale-95 ${
+                on
+                  ? "bg-slate-800 border-cyan-400 text-white shadow-[0_0_10px_rgba(34,211,238,0.4)]"
+                  : "bg-slate-900/90 border-slate-700 text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              <Power className={`w-3 h-3 ${on ? "text-emerald-400" : "text-slate-500"}`} />
+              <span>{btn.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 4. Top-Right 4 Resources Panel */}
+      <div className="fixed right-4 sm:right-7 top-16 sm:top-20 z-20 w-64 sm:w-80 bg-slate-950/85 backdrop-blur-md border border-white/20 rounded-3xl p-4 sm:p-5 shadow-2xl">
+        <div className="text-xs font-extrabold uppercase tracking-widest text-slate-300 mb-3">
+          4 RESOURCES
+        </div>
+        <div className="flex flex-col gap-2.5">
+          {resourceRows.map((r) => {
+            const currentVal = displayedStats[r.key];
+            const previewVal = previewStats ? previewStats[r.key] : null;
+            const shownVal = previewVal !== null ? previewVal : currentVal;
+            const isDropping = previewVal !== null && previewVal < currentVal;
+
+            return (
+              <div key={r.key}>
+                <div className="flex items-center justify-between text-xs font-extrabold mb-1">
+                  <span className="text-white tracking-wide">{r.label}</span>
+                  <span className={isDropping ? "text-rose-400 animate-pulse" : r.textColor}>
+                    {shownVal}%
+                    {isDropping && (
+                      <span className="ml-1 text-[11px] text-rose-300">
+                        ({shownVal - currentVal}%)
+                      </span>
+                    )}
+                  </span>
                 </div>
-              );
-            })}
-          </div>
+                <div className="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden p-0.5">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      isDropping ? "bg-rose-400" : r.barColor
+                    }`}
+                    style={{ width: `${shownVal}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -500,11 +607,10 @@ export default function LunarCockpitTask({ t, onCompleteCockpitTask, onPlaySfx }
       )}
 
       {/* 6. Bottom Dialogue Bar with Expressive Dr. Farah & Next / Exit Rocket Button */}
-      <div className="relative z-20 px-4 sm:px-8 pb-4 sm:pb-6">
+      <div className="fixed bottom-3 sm:bottom-5 inset-x-0 z-20 px-4 sm:px-8 pointer-events-none">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-end gap-4">
-          {/* Speech Bubble */}
-          <div className="flex-1 w-full bg-white text-slate-900 rounded-3xl px-6 py-4 sm:py-5 shadow-[0_20px_50px_rgba(0,0,0,0.65)] border-2 border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="font-sans font-bold text-sm sm:text-lg leading-snug text-center sm:text-left">
+          <div className="pointer-events-auto flex-1 w-full bg-white text-slate-900 rounded-3xl px-5 py-3.5 sm:px-6 sm:py-4 shadow-[0_20px_50px_rgba(0,0,0,0.75)] border-2 border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="font-sans font-bold text-xs sm:text-base leading-snug text-center sm:text-left">
               {currentDialogue}
             </p>
 
@@ -533,35 +639,23 @@ export default function LunarCockpitTask({ t, onCompleteCockpitTask, onPlaySfx }
             )}
           </div>
 
-          {/* Expressive Dr. Farah Character Badge with Status Tablet */}
-          <div className="relative shrink-0 flex flex-col items-center">
+          {/* Expressive Dr. Farah Character Badge */}
+          <div className="pointer-events-auto relative shrink-0 hidden sm:flex flex-col items-center">
             {isChilly && (
               <div className="absolute -top-3 -left-3 px-2 py-0.5 rounded-full bg-sky-200 text-slate-900 text-[10px] font-extrabold shadow animate-bounce">
                 ❄️ Brrr! -130°C
               </div>
             )}
-            <DrFarahPortrait
-              mood={isSunsetAlert ? "alert" : "happy"}
-              size="lg"
-            />
+            <DrFarahPortrait mood={isSunsetAlert ? "alert" : "happy"} size="md" />
             <div
-              className={`mt-1.5 px-3 py-1 rounded-lg border text-[10px] font-mono font-extrabold uppercase flex items-center gap-1 shadow ${
+              className={`mt-1 px-2.5 py-0.5 rounded-lg border text-[9px] font-mono font-extrabold uppercase flex items-center gap-1 shadow ${
                 isSunsetAlert
                   ? "bg-rose-950/90 border-rose-400 text-rose-300"
                   : "bg-emerald-950/90 border-emerald-400 text-emerald-300"
               }`}
             >
-              {isSunsetAlert ? (
-                <>
-                  <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
-                  <span>ALERT TABLET</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>ALL STABLE</span>
-                </>
-              )}
+              <Sparkles className="w-3 h-3" />
+              <span>{isSunsetAlert ? "ALERT" : "STABLE"}</span>
             </div>
           </div>
         </div>

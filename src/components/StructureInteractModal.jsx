@@ -1,6 +1,19 @@
 import React, { useEffect, useState } from "react";
 import DrFarahAvatar, { DrFarahHelperPopup, DrFarahPortrait } from "./DrFarahAvatar";
-import { Clock, ClipboardCheck, BookOpen, LogOut, Sparkles, Rocket, Compass } from "lucide-react";
+import {
+  Clock,
+  ClipboardCheck,
+  BookOpen,
+  LogOut,
+  Sparkles,
+  Rocket,
+  Compass,
+  CheckCircle2,
+  Zap,
+  Sliders,
+  FlaskConical,
+} from "lucide-react";
+import { spaceAudio } from "../utils/sound";
 
 const ICON_MAP = {
   power: "⚡",
@@ -33,8 +46,285 @@ function DirectionalBadges({ effects, resourceNames }) {
   );
 }
 
+// -----------------------------------------------------------------------------
+// AMONG US MINI-GAME 1: Fix Wiring (For "solar" structure task)
+// -----------------------------------------------------------------------------
+const LEFT_WIRES = [
+  { id: "red", label: "RED", hex: "#ef4444", y: 22 },
+  { id: "yellow", label: "YLW", hex: "#facc15", y: 50 },
+  { id: "cyan", label: "CYN", hex: "#22d3ee", y: 78 },
+];
+const RIGHT_WIRES = [
+  { id: "cyan", label: "CYN", hex: "#22d3ee", y: 22 },
+  { id: "red", label: "RED", hex: "#ef4444", y: 50 },
+  { id: "yellow", label: "YLW", hex: "#facc15", y: 78 },
+];
+
+function FixWiringMiniTask({ lang, onCompleted }) {
+  const [selectedLeft, setSelectedLeft] = useState(null);
+  const [connected, setConnected] = useState([]); // array of color ids
+
+  const handleLeftClick = (id) => {
+    if (connected.includes(id)) return;
+    spaceAudio.playTone(520, 0.06, "sine", 0.1);
+    setSelectedLeft(id);
+  };
+
+  const handleRightClick = (id) => {
+    if (connected.includes(id)) return;
+    if (selectedLeft === id) {
+      spaceAudio.playTone(780, 0.12, "sine", 0.12);
+      const next = [...connected, id];
+      setConnected(next);
+      setSelectedLeft(null);
+      if (next.length === LEFT_WIRES.length) {
+        onCompleted?.();
+      }
+    } else if (selectedLeft) {
+      spaceAudio.playTone(220, 0.12, "triangle", 0.1);
+      setSelectedLeft(null);
+    }
+  };
+
+  const allDone = connected.length === LEFT_WIRES.length;
+
+  return (
+    <div className="p-3.5 rounded-2xl bg-slate-950/90 border-2 border-amber-400/50 mb-4">
+      <div className="flex items-center justify-between text-xs font-extrabold uppercase tracking-wider mb-2">
+        <span className="flex items-center gap-1.5 text-amber-300">
+          <Zap className="w-4 h-4" />
+          <span>
+            {lang === "ms"
+              ? "Tugasan Mini: Sambungkan Wayar Panel Suria"
+              : "Mini-Task: Fix Solar Array Wiring (Click Matching Colors)"}
+          </span>
+        </span>
+        <span className={allDone ? "text-emerald-400" : "text-slate-400"}>
+          {connected.length}/{LEFT_WIRES.length} {allDone ? "✓ ONLINE" : ""}
+        </span>
+      </div>
+
+      <div className="relative h-28 bg-slate-900 rounded-xl border border-white/10 px-3 py-2 flex items-center justify-between">
+        {/* Left Terminals */}
+        <div className="z-10 flex flex-col justify-between h-full py-1">
+          {LEFT_WIRES.map((w) => {
+            const isConn = connected.includes(w.id);
+            const isSel = selectedLeft === w.id;
+            return (
+              <button
+                key={w.id}
+                type="button"
+                onClick={() => handleLeftClick(w.id)}
+                className={`px-3 py-1 rounded-lg font-mono text-xs font-extrabold border-2 transition ${
+                  isConn
+                    ? "opacity-60 border-emerald-400"
+                    : isSel
+                    ? "scale-110 border-white shadow-[0_0_12px_rgba(255,255,255,0.7)]"
+                    : "border-transparent hover:scale-105"
+                }`}
+                style={{ backgroundColor: w.hex, color: "#0f172a" }}
+              >
+                {w.label} ●
+              </button>
+            );
+          })}
+        </div>
+
+        {/* SVG Wires */}
+        <svg
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+        >
+          {connected.map((id) => {
+            const l = LEFT_WIRES.find((w) => w.id === id);
+            const r = RIGHT_WIRES.find((w) => w.id === id);
+            if (!l || !r) return null;
+            return (
+              <line
+                key={id}
+                x1="16"
+                y1={l.y}
+                x2="84"
+                y2={r.y}
+                stroke={l.hex}
+                strokeWidth="5"
+                strokeLinecap="round"
+              />
+            );
+          })}
+        </svg>
+
+        {/* Right Terminals */}
+        <div className="z-10 flex flex-col justify-between h-full py-1">
+          {RIGHT_WIRES.map((w) => {
+            const isConn = connected.includes(w.id);
+            return (
+              <button
+                key={w.id}
+                type="button"
+                onClick={() => handleRightClick(w.id)}
+                className={`px-3 py-1 rounded-lg font-mono text-xs font-extrabold border-2 transition ${
+                  isConn
+                    ? "opacity-60 border-emerald-400"
+                    : selectedLeft
+                    ? "border-white/70 animate-pulse hover:scale-105"
+                    : "border-transparent"
+                }`}
+                style={{ backgroundColor: w.hex, color: "#0f172a" }}
+              >
+                ● {w.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// AMONG US MINI-GAME 2: Divert Power Sliders (For "comms" structure task)
+// -----------------------------------------------------------------------------
+function DivertPowerMiniTask({ lang, onCompleted }) {
+  const [sliders, setSliders] = useState([35, 40, 30]);
+
+  const boostSlider = (idx) => {
+    spaceAudio.playTone(580 + idx * 110, 0.1, "sine", 0.11);
+    setSliders((prev) => {
+      const next = [...prev];
+      next[idx] = 100;
+      if (next.every((v) => v >= 100)) {
+        onCompleted?.();
+      }
+      return next;
+    });
+  };
+
+  const allDone = sliders.every((v) => v >= 100);
+  const labels = ["COIL A", "DISH GAIN", "SHIELD BUS"];
+
+  return (
+    <div className="p-3.5 rounded-2xl bg-slate-950/90 border-2 border-cyan-400/50 mb-4">
+      <div className="flex items-center justify-between text-xs font-extrabold uppercase tracking-wider mb-2">
+        <span className="flex items-center gap-1.5 text-cyan-300">
+          <Sliders className="w-4 h-4" />
+          <span>
+            {lang === "ms"
+              ? "Tugasan Mini: Alihkan Kuasa ke Perisai (Klik Suis)"
+              : "Mini-Task: Divert Power to Storm Shields (Click Faders to Max)"}
+          </span>
+        </span>
+        <span className={allDone ? "text-emerald-400" : "text-slate-400"}>
+          {sliders.filter((v) => v >= 100).length}/3 {allDone ? "✓ LOCKED" : ""}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 bg-slate-900 rounded-xl p-3 border border-white/10">
+        {sliders.map((val, idx) => {
+          const locked = val >= 100;
+          return (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => boostSlider(idx)}
+              className={`flex flex-col items-center p-2 rounded-xl border transition ${
+                locked
+                  ? "bg-emerald-950/60 border-emerald-400 text-emerald-300"
+                  : "bg-slate-800 hover:bg-slate-700 border-amber-400/50 text-amber-200 animate-pulse"
+              }`}
+            >
+              <div className="text-[10px] font-mono font-bold mb-1.5">{labels[idx]}</div>
+              <div className="w-6 h-14 rounded-full bg-slate-950 border border-white/15 p-0.5 flex flex-col justify-end overflow-hidden">
+                <div
+                  className={`w-full rounded-full transition-all duration-300 ${
+                    locked ? "bg-emerald-400" : "bg-amber-400"
+                  }`}
+                  style={{ height: `${val}%` }}
+                />
+              </div>
+              <div className="mt-1 text-[10px] font-mono font-extrabold">
+                {locked ? "100% ▲" : "BOOST ▲"}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// AMONG US MINI-GAME 3: Inspect Sample Tubes (For "algae" structure task)
+// -----------------------------------------------------------------------------
+function InspectSampleMiniTask({ lang, onCompleted }) {
+  // 5 tubes: true = purified green, false = red anomaly needing click
+  const [tubes, setTubes] = useState([false, true, false, true, false]);
+
+  const purifyTube = (idx) => {
+    if (tubes[idx]) return;
+    spaceAudio.playTone(740, 0.1, "sine", 0.11);
+    setTubes((prev) => {
+      const next = [...prev];
+      next[idx] = true;
+      if (next.every(Boolean)) {
+        onCompleted?.();
+      }
+      return next;
+    });
+  };
+
+  const allDone = tubes.every(Boolean);
+
+  return (
+    <div className="p-3.5 rounded-2xl bg-slate-950/90 border-2 border-emerald-400/50 mb-4">
+      <div className="flex items-center justify-between text-xs font-extrabold uppercase tracking-wider mb-2">
+        <span className="flex items-center gap-1.5 text-emerald-300">
+          <FlaskConical className="w-4 h-4" />
+          <span>
+            {lang === "ms"
+              ? "Tugasan Mini: Tulenkan Sampel Alga Merah"
+              : "Mini-Task: Inspect & Purify Red Algae Samples"}
+          </span>
+        </span>
+        <span className={allDone ? "text-emerald-400" : "text-rose-300"}>
+          {tubes.filter(Boolean).length}/5 {allDone ? "✓ PURE" : ""}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-5 gap-2 bg-slate-900 rounded-xl p-3 border border-white/10">
+        {tubes.map((pure, idx) => (
+          <button
+            key={idx}
+            type="button"
+            onClick={() => purifyTube(idx)}
+            className={`flex flex-col items-center p-2 rounded-xl border transition ${
+              pure
+                ? "bg-emerald-950/50 border-emerald-400/50 text-emerald-300"
+                : "bg-rose-950/80 hover:bg-rose-900 border-rose-400 text-rose-200 animate-bounce"
+            }`}
+          >
+            <div className="text-[9px] font-mono font-bold mb-1">T-0{idx + 1}</div>
+            <div
+              className={`w-4 h-10 rounded-b-full border ${
+                pure
+                  ? "bg-emerald-400/80 border-emerald-200 shadow-[0_0_10px_#34d399]"
+                  : "bg-rose-500 border-rose-200 shadow-[0_0_12px_#f43f5e]"
+              }`}
+            />
+            <div className="mt-1 text-[9px] font-mono font-extrabold">
+              {pure ? "OK" : "FIX"}
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function StructureInteractModal({
   t,
+  lang = "en",
   nearbyStructure,
   activeStructure,
   interactionMode, // null | "menu" | "task" | "fact"
@@ -54,11 +344,25 @@ export default function StructureInteractModal({
   onPlaySfx,
 }) {
   const [timeLeft, setTimeLeft] = useState(30);
+  const [miniTaskDone, setMiniTaskDone] = useState(false);
 
-  // Reset 30s timer whenever Task modal opens
+  // Only "solar", "comms", and "algae" have Among Us mini-tasks (3 of 6 structures)
+  const hasMiniTask =
+    activeStructure?.id === "solar" ||
+    activeStructure?.id === "comms" ||
+    activeStructure?.id === "algae";
+
+  // Reset 30s timer & mini-task state whenever Task modal opens
   useEffect(() => {
     if (interactionMode !== "task" || !activeStructure) return;
     setTimeLeft(30);
+    setMiniTaskDone(
+      !(
+        activeStructure.id === "solar" ||
+        activeStructure.id === "comms" ||
+        activeStructure.id === "algae"
+      )
+    );
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -76,7 +380,11 @@ export default function StructureInteractModal({
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (showUpgradeModal) return;
-      if ((e.code === "KeyE" || e.key === "e" || e.key === "E") && !interactionMode && nearbyStructure) {
+      if (
+        (e.code === "KeyE" || e.key === "e" || e.key === "E") &&
+        !interactionMode &&
+        nearbyStructure
+      ) {
         e.preventDefault();
         onOpenMenu(nearbyStructure);
       } else if (e.code === "Escape" && interactionMode) {
@@ -264,7 +572,7 @@ export default function StructureInteractModal({
     );
   }
 
-  // 4. Structure Task Choice Modal (with 30s Countdown Timer & Dr. Farah AI Helper Chatbot)
+  // 4. Structure Task Choice Modal (with 30s Timer, Dr. Farah AI Helper, & Among Us Mini-Tasks on 3 structures)
   if (interactionMode === "task" && activeStructure) {
     const solCopy = t.sols[activeStructure.day];
     const pct = (timeLeft / 30) * 100;
@@ -307,26 +615,71 @@ export default function StructureInteractModal({
             </div>
 
             {/* 30-Second Countdown Progress Bar */}
-            <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden mb-4">
+            <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden mb-3">
               <div
                 className={`h-full transition-all duration-300 ${barColor}`}
                 style={{ width: `${pct}%` }}
               />
             </div>
 
-            <p className="text-xs sm:text-sm text-slate-200 leading-relaxed mb-4">
+            <p className="text-xs sm:text-sm text-slate-200 leading-relaxed mb-3.5">
               {solCopy.context}
             </p>
 
+            {/* AMONG US INTERACTIVE MINI-TASKS (Only on "solar", "comms", and "algae") */}
+            {activeStructure.id === "solar" && (
+              <FixWiringMiniTask
+                lang={lang}
+                onCompleted={() => {
+                  onPlaySfx?.("success");
+                  setMiniTaskDone(true);
+                }}
+              />
+            )}
+            {activeStructure.id === "comms" && (
+              <DivertPowerMiniTask
+                lang={lang}
+                onCompleted={() => {
+                  onPlaySfx?.("success");
+                  setMiniTaskDone(true);
+                }}
+              />
+            )}
+            {activeStructure.id === "algae" && (
+              <InspectSampleMiniTask
+                lang={lang}
+                onCompleted={() => {
+                  onPlaySfx?.("success");
+                  setMiniTaskDone(true);
+                }}
+              />
+            )}
+
+            {hasMiniTask && !miniTaskDone && (
+              <div className="mb-2.5 text-center text-xs font-extrabold text-amber-300 animate-pulse">
+                {lang === "ms"
+                  ? "⬆️ Selesaikan tugasan mini di atas untuk mengaktifkan pilihan!"
+                  : "⬆️ Complete the interactive terminal mini-task above to unlock your decision!"}
+              </div>
+            )}
+
             {/* Choices A & B */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+            <div
+              className={`grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 transition-opacity ${
+                hasMiniTask && !miniTaskDone ? "opacity-45 pointer-events-none" : "opacity-100"
+              }`}
+            >
               <button
                 type="button"
+                disabled={hasMiniTask && !miniTaskDone}
                 onClick={() => onChooseTaskOption(activeStructure, "A", timeLeft)}
                 className="text-left p-3.5 sm:p-4 rounded-2xl bg-slate-800/90 hover:bg-slate-700/90 border-2 border-cyan-400/45 hover:border-cyan-300 transition shadow-md active:scale-[0.99]"
               >
-                <div className="font-bold text-sm sm:text-base text-white">
-                  a. {solCopy.choiceA}
+                <div className="font-bold text-sm sm:text-base text-white flex items-center justify-between">
+                  <span>a. {solCopy.choiceA}</span>
+                  {hasMiniTask && miniTaskDone && (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  )}
                 </div>
                 <DirectionalBadges
                   effects={activeStructure.choiceA.effects}
@@ -336,11 +689,15 @@ export default function StructureInteractModal({
 
               <button
                 type="button"
+                disabled={hasMiniTask && !miniTaskDone}
                 onClick={() => onChooseTaskOption(activeStructure, "B", timeLeft)}
                 className="text-left p-3.5 sm:p-4 rounded-2xl bg-slate-800/90 hover:bg-slate-700/90 border-2 border-amber-400/45 hover:border-amber-300 transition shadow-md active:scale-[0.99]"
               >
-                <div className="font-bold text-sm sm:text-base text-white">
-                  b. {solCopy.choiceB}
+                <div className="font-bold text-sm sm:text-base text-white flex items-center justify-between">
+                  <span>b. {solCopy.choiceB}</span>
+                  {hasMiniTask && miniTaskDone && (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  )}
                 </div>
                 <DirectionalBadges
                   effects={activeStructure.choiceB.effects}

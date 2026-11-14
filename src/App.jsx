@@ -414,6 +414,7 @@ export default function App() {
       {phase === "playing" && (
         <StructureInteractModal
           t={t}
+          lang={lang}
           nearbyStructure={nearbyStructure}
           activeStructure={activeStructure}
           interactionMode={interactionMode}
