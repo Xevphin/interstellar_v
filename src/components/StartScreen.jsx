@@ -1,20 +1,32 @@
 import React from "react";
-import { Settings, Rocket, Sparkles } from "lucide-react";
+import { Settings, Rocket, Sparkles, ArrowLeft } from "lucide-react";
 import { DrFarahPortrait } from "./DrFarahAvatar";
 
-export default function StartScreen({ t, onStartMission, onOpenSettings, onOpenNasa }) {
+export default function StartScreen({ t, onStartMission, onBack, onOpenSettings, onOpenNasa }) {
   return (
     <div className="fixed inset-0 z-20 flex flex-col justify-between p-4 sm:p-8 pointer-events-none">
       {/* Top Bar */}
       <div className="flex items-center justify-between pointer-events-auto">
-        <button
-          type="button"
-          onClick={onOpenNasa}
-          className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-slate-900/80 hover:bg-slate-800/90 backdrop-blur-md border border-white/15 text-xs sm:text-sm font-bold text-sky-200 transition shadow-lg"
-        >
-          <Sparkles className="w-4 h-4 text-sky-400" />
-          <span>{t.nasaDataBtn}</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-slate-900/80 hover:bg-slate-800/90 backdrop-blur-md border border-white/15 text-xs sm:text-sm font-bold text-slate-200 transition shadow-lg"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>{t.select?.backBtn || "Back"}</span>
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onOpenNasa}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-slate-900/80 hover:bg-slate-800/90 backdrop-blur-md border border-white/15 text-xs sm:text-sm font-bold text-sky-200 transition shadow-lg"
+          >
+            <Sparkles className="w-4 h-4 text-sky-400" />
+            <span>{t.nasaDataBtn}</span>
+          </button>
+        </div>
 
         <button
           type="button"

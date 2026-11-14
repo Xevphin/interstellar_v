@@ -8,6 +8,14 @@ class SpaceAudio {
     this.ambientOsc1 = null;
     this.ambientOsc2 = null;
     this.ambientRunning = false;
+    this.volume = 0.8;
+  }
+
+  setVolume(value) {
+    this.volume = Math.max(0, Math.min(1, value));
+    if (this.ambientGain && this.ctx) {
+      this.ambientGain.gain.setTargetAtTime(Math.max(0.0001, 0.045 * this.volume), this.ctx.currentTime, 0.1);
+    }
   }
 
   init() {
@@ -46,7 +54,7 @@ class SpaceAudio {
 
       const gain = this.ctx.createGain();
       gain.gain.setValueAtTime(0.001, now);
-      gain.gain.exponentialRampToValueAtTime(0.045, now + 1.5);
+      gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, 0.045 * this.volume), now + 1.5);
 
       const osc1 = this.ctx.createOscillator();
       osc1.type = "sine";
@@ -98,11 +106,12 @@ class SpaceAudio {
   }
 
   playTone(freq, duration = 0.12, type = "sine", volume = 0.12, delay = 0) {
-    if (!this.ensureContext()) return;
+    if (!this.ensureContext() || this.volume <= 0) return;
     try {
       const now = this.ctx.currentTime + delay;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
+      volume *= this.volume;
 
       osc.type = type;
       osc.frequency.setValueAtTime(freq, now);

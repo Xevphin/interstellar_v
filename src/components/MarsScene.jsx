@@ -166,14 +166,14 @@ function StructureBeacon({ structure, isNearby, isCompleted, label, interactProm
       </mesh>
 
       {/* Floating [E] Interact / Structure Status Tag */}
-      <Html position={[0, 3.6, 0]} center distanceFactor={18}>
+      <Html position={[0, 3.6, 0]} center distanceFactor={18} style={{ pointerEvents: "none" }}>
         <button
           type="button"
           onClick={(e) => {
             e.stopPropagation();
             onSelect(structure);
           }}
-          className={`px-3 py-1 rounded-full backdrop-blur-md border text-xs font-extrabold whitespace-nowrap shadow-lg transition transform ${
+          className={`pointer-events-auto px-3 py-1 rounded-full backdrop-blur-md border text-xs font-extrabold whitespace-nowrap shadow-lg transition transform ${
             isNearby
               ? "bg-cyan-400 text-slate-950 border-white scale-110 shadow-[0_0_20px_rgba(34,211,238,0.7)]"
               : isCompleted
@@ -461,6 +461,7 @@ function UpgradedRoverAndCamera({
   roverUpgraded,
   dpadInput,
   targetTeleport,
+  cameraSensitivity = 1,
   onProximityChange,
 }) {
   const roverGroupRef = useRef();
@@ -519,9 +520,9 @@ function UpgradedRoverAndCamera({
     };
     const onPointerMove = (e) => {
       if (!phys.current.isPointerDragging || !roverMode) return;
-      phys.current.orbitYawOffset -= e.movementX * 0.0045;
+      phys.current.orbitYawOffset -= e.movementX * 0.0045 * cameraSensitivity;
       phys.current.orbitPitchOffset = THREE.MathUtils.clamp(
-        phys.current.orbitPitchOffset + e.movementY * 0.0035,
+        phys.current.orbitPitchOffset + e.movementY * 0.0035 * cameraSensitivity,
         0.12,
         0.85
       );
@@ -540,7 +541,16 @@ function UpgradedRoverAndCamera({
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointermove", onPointerMove);
     };
-  }, [gl, roverMode]);
+  }, [gl, roverMode, cameraSensitivity]);
+
+  // When switching into Orbit View (!roverMode), position camera nicely overlooking the outpost
+  useEffect(() => {
+    if (!roverMode && orbitControlsRef.current) {
+      camera.position.set(0, 14, 22);
+      orbitControlsRef.current.target.set(0, 1.2, 0);
+      orbitControlsRef.current.update();
+    }
+  }, [roverMode, camera]);
 
   useFrame(({ clock }, rawDelta) => {
     const dt = Math.min(rawDelta, 0.05);
@@ -843,15 +853,18 @@ function UpgradedRoverAndCamera({
       {(phase === "start" || !roverMode) && (
         <OrbitControls
           ref={orbitControlsRef}
-          enablePan={false}
-          enableDamping
-          dampingFactor={0.07}
-          autoRotate={phase === "start"}
-          autoRotateSpeed={0.55}
-          minDistance={7}
-          maxDistance={34}
-          maxPolarAngle={Math.PI / 2 - 0.08}
-          minPolarAngle={0.2}
+          makeDefault
+          enableRotate={true}
+          enableZoom={true}
+          enablePan={true}
+          enableDamping={true}
+          dampingFactor={0.05}
+          rotateSpeed={0.85 * cameraSensitivity}
+          zoomSpeed={1.0}
+          minDistance={6}
+          maxDistance={38}
+          maxPolarAngle={Math.PI / 2 - 0.06}
+          minPolarAngle={0.15}
         />
       )}
     </>
@@ -873,6 +886,8 @@ export default function MarsScene({
   targetTeleport,
   moduleLabels,
   interactPrompt,
+  cameraSensitivity = 1,
+  graphicsQuality = "high",
   onProximityChange,
   onSelectStructure,
 }) {
@@ -880,10 +895,15 @@ export default function MarsScene({
   const isNight = phase === "playing" && currentSol === 6;
   const solarStorm = phase === "playing" && currentSol === 3;
   const skyColor = isLunar ? "#070b16" : isNight ? "#090f20" : "#c86d51";
+  const high = graphicsQuality === "high";
 
   return (
     <div className="fixed inset-0 z-0">
-      <Canvas shadows camera={{ position: [0, 8.5, 16], fov: 52 }}>
+      <Canvas
+        shadows={high}
+        dpr={high ? [1, 2] : 1}
+        camera={{ position: [0, 8.5, 16], fov: 52 }}
+      >
         <color attach="background" args={[skyColor]} />
         <fogExp2 attach="fog" args={[skyColor, isLunar ? 0.008 : 0.013]} />
 
@@ -895,8 +915,8 @@ export default function MarsScene({
           position={[18, 24, 14]}
           intensity={isLunar ? 1.9 : isNight ? 0.5 : 1.75}
           color={isLunar ? "#f8fafc" : "#fff7ed"}
-          castShadow
-          shadow-mapSize={[1024, 1024]}
+          castShadow={high}
+          shadow-mapSize={high ? [1024, 1024] : [512, 512]}
           shadow-camera-left={-26}
           shadow-camera-right={26}
           shadow-camera-top={26}
@@ -904,7 +924,7 @@ export default function MarsScene({
         />
 
         {(isLunar || isNight) && (
-          <Stars radius={80} depth={35} count={1800} factor={3.4} fade />
+          <Stars radius={80} depth={35} count={high ? 1800 : 800} factor={3.4} fade />
         )}
 
         <CraterTerrain planet={planet} />
@@ -929,6 +949,7 @@ export default function MarsScene({
           roverUpgraded={roverUpgraded}
           dpadInput={dpadInput}
           targetTeleport={targetTeleport}
+          cameraSensitivity={cameraSensitivity}
           onProximityChange={onProximityChange}
         />
       </Canvas>

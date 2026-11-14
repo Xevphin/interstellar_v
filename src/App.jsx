@@ -1,6 +1,10 @@
 import React, { useCallback, useMemo, useState } from "react";
 import MarsScene from "./components/MarsScene";
+import TitleScene from "./components/three/TitleScene";
+import TitleScreen from "./components/TitleScreen";
 import StartScreen from "./components/StartScreen";
+import LaunchCutscene from "./components/cutscenes/LaunchCutscene";
+import ReturnCutscene from "./components/cutscenes/ReturnCutscene";
 import HUD from "./components/HUD";
 import IntroGreetingModal from "./components/IntroGreetingModal";
 import StructureInteractModal from "./components/StructureInteractModal";
@@ -9,16 +13,27 @@ import {
   LeaderboardModal,
   CertificateModal,
 } from "./components/QuizAndCertificate";
-import { SettingsModal, LoseModal, NasaDataModal } from "./components/Modals";
+import {
+  SettingsModal,
+  CreditsModal,
+  LoseModal,
+  NasaDataModal,
+} from "./components/Modals";
 import { TRANSLATIONS } from "./data/translations";
+import { FLOW_TRANSLATIONS } from "./data/flowTranslations";
 import { INITIAL_STATS, OUTPOST_STRUCTURES, RESOURCE_KEYS } from "./data/sols";
 import { spaceAudio } from "./utils/sound";
 
 export default function App() {
   const [lang, setLang] = useState("en");
   const [soundOn, setSoundOn] = useState(true);
+  const [volume, setVolume] = useState(0.8);
+  const [cameraSensitivity, setCameraSensitivity] = useState(1.0);
+  const [graphicsQuality, setGraphicsQuality] = useState("high");
+
   const [planet, setPlanet] = useState("lunar");
-  const [phase, setPhase] = useState("start"); // start | intro | playing | lost | quiz | leaderboard | certificate
+  // Flow phases: title -> select -> launchCutscene -> intro -> playing -> returnCutscene -> quiz -> leaderboard -> certificate (or lost)
+  const [phase, setPhase] = useState("title");
 
   const [stats, setStats] = useState({ ...INITIAL_STATS });
   const [completedTasks, setCompletedTasks] = useState([]);
@@ -52,9 +67,17 @@ export default function App() {
   const [commanderName, setCommanderName] = useState("");
 
   const [showSettings, setShowSettings] = useState(false);
+  const [showCredits, setShowCredits] = useState(false);
   const [showNasa, setShowNasa] = useState(false);
 
-  const t = TRANSLATIONS[lang];
+  const t = useMemo(
+    () => ({
+      ...TRANSLATIONS[lang],
+      ...FLOW_TRANSLATIONS[lang],
+    }),
+    [lang]
+  );
+
   const roverUpgraded = completedTasks.length >= OUTPOST_STRUCTURES.length;
   const currentSol = Math.min(6, completedTasks.length + 1);
 
@@ -83,7 +106,12 @@ export default function App() {
     if (next) spaceAudio.playClick();
   };
 
-  const resetMission = (targetPhase = "intro") => {
+  const handleChangeVolume = (nextVol) => {
+    setVolume(nextVol);
+    spaceAudio.setVolume(nextVol);
+  };
+
+  const resetMission = (targetPhase = "title") => {
     setStats({ ...INITIAL_STATS });
     setCompletedTasks([]);
     setTaskTimeBonus(0);
@@ -98,12 +126,23 @@ export default function App() {
     setPhase(targetPhase);
   };
 
-  const handleStartMission = (selectedPlanet = "lunar") => {
+  const handleTitleStart = () => {
+    if (soundOn) spaceAudio.startAmbient();
+    playSfx("click");
+    setPhase("select");
+  };
+
+  const handleSelectPlanetAndLaunch = (selectedPlanet = "lunar") => {
     setPlanet(selectedPlanet);
     if (soundOn) spaceAudio.startAmbient();
     playSfx("success");
-    resetMission("intro");
+    resetMission("launchCutscene");
   };
+
+  const handleLaunchCutsceneComplete = useCallback(() => {
+    playSfx("success");
+    setPhase("intro");
+  }, [playSfx]);
 
   const handleStartExploration = () => {
     playSfx("click");
@@ -187,7 +226,6 @@ export default function App() {
       if (!structure) return;
       playSfx("alert");
       setTimeoutBanner(true);
-      // Apply default emergency consequence (-10% Power & Oxygen) cleanly without freezing
       applyTaskEffects(structure, { power: -10, oxygen: -10 }, false, 0);
     },
     [applyTaskEffects, playSfx]
@@ -201,36 +239,103 @@ export default function App() {
     setTargetTeleport({ ...nextStruct, tick: Date.now() });
   };
 
+  const handleStartReturnCutscene = () => {
+    playSfx("victory");
+    setShowUpgradeModal(false);
+    setPhase("returnCutscene");
+  };
+
+  const handleReturnCutsceneComplete = useCallback(() => {
+    playSfx("success");
+    setPhase("quiz");
+  }, [playSfx]);
+
   const isRoverPaused =
     phase !== "playing" || Boolean(interactionMode) || showUpgradeModal;
 
+  const showTitleScene = phase === "title" || phase === "select";
+  const showOutpostScene =
+    phase === "intro" ||
+    phase === "playing" ||
+    phase === "lost" ||
+    phase === "quiz" ||
+    phase === "leaderboard" ||
+    phase === "certificate";
+
   return (
     <div className="relative w-screen h-screen overflow-hidden select-none">
-      {/* 3D Open-World Lunar / Mars Outpost Scene */}
-      <MarsScene
-        planet={planet}
-        phase={phase}
-        stats={stats}
-        currentSol={currentSol}
-        panelsDusty={panelsDusty}
-        roverMode={roverMode}
-        isPaused={isRoverPaused}
-        roverUpgraded={roverUpgraded}
-        dpadInput={dpadInput}
-        nearbyStructure={nearbyStructure}
-        completedTasks={completedTasks}
-        targetTeleport={targetTeleport}
-        moduleLabels={t.modules}
-        interactPrompt={t.interactPrompt}
-        onProximityChange={setNearbyStructure}
-        onSelectStructure={handleOpenStructureMenu}
-      />
+      {/* 1. Earth Stratosphere & Flying Rocket Scene (No Basecamp Spoilers!) */}
+      {showTitleScene && <TitleScene graphicsQuality={graphicsQuality} />}
 
-      {/* Start Screen */}
-      {phase === "start" && (
+      {/* 2. Post-Selection 3-2-1 Liftoff Rocket Launch Cutscene */}
+      {phase === "launchCutscene" && (
+        <LaunchCutscene
+          t={t}
+          planet={planet}
+          graphicsQuality={graphicsQuality}
+          onComplete={handleLaunchCutsceneComplete}
+        />
+      )}
+
+      {/* 3. Mission Completion Return-to-Earth Cutscene */}
+      {phase === "returnCutscene" && (
+        <ReturnCutscene
+          t={t}
+          planet={planet}
+          graphicsQuality={graphicsQuality}
+          onComplete={handleReturnCutsceneComplete}
+        />
+      )}
+
+      {/* 4. 3D Open-World Lunar / Mars Outpost Scene (Mounted only after arriving at planet!) */}
+      {showOutpostScene && (
+        <MarsScene
+          planet={planet}
+          phase={phase}
+          stats={stats}
+          currentSol={currentSol}
+          panelsDusty={panelsDusty}
+          roverMode={roverMode}
+          isPaused={isRoverPaused}
+          roverUpgraded={roverUpgraded}
+          dpadInput={dpadInput}
+          nearbyStructure={nearbyStructure}
+          completedTasks={completedTasks}
+          targetTeleport={targetTeleport}
+          moduleLabels={t.modules}
+          interactPrompt={t.interactPrompt}
+          cameraSensitivity={cameraSensitivity}
+          graphicsQuality={graphicsQuality}
+          onProximityChange={setNearbyStructure}
+          onSelectStructure={handleOpenStructureMenu}
+        />
+      )}
+
+      {/* Main Title Screen Overlay */}
+      {phase === "title" && (
+        <TitleScreen
+          t={t}
+          onStart={handleTitleStart}
+          onOpenSettings={() => {
+            playSfx("click");
+            setShowSettings(true);
+          }}
+          onOpenCredits={() => {
+            playSfx("click");
+            setShowCredits(true);
+          }}
+        />
+      )}
+
+      {/* Select Your 6-Day Outpost Mission Screen */}
+      {phase === "select" && (
         <StartScreen
           t={t}
-          onStartMission={handleStartMission}
+          onStartMission={handleSelectPlanetAndLaunch}
+          onBack={() => {
+            playSfx("click");
+            setPhase("title");
+          }}
           onOpenSettings={() => {
             playSfx("click");
             setShowSettings(true);
@@ -242,16 +347,18 @@ export default function App() {
         />
       )}
 
-      {/* Dr. Farah Interactive Intro Greeting Overlay */}
+      {/* Planet-Specific Dr. Farah Bubble-Chat Introduction */}
       {phase === "intro" && (
         <IntroGreetingModal
           t={t}
+          planet={planet}
           onStartExploration={handleStartExploration}
+          onPlaySfx={playSfx}
         />
       )}
 
       {/* Top HUD Bar */}
-      {phase !== "start" && phase !== "intro" && (
+      {showOutpostScene && phase !== "intro" && (
         <HUD
           t={t}
           planet={planet}
@@ -276,7 +383,7 @@ export default function App() {
         />
       )}
 
-      {/* Unified [E] Structure Interaction Menu, Task Modal (30s Timer + Dr. Farah AI Helper), Fact Modal & Upgrade Celebration */}
+      {/* Unified [E] Structure Interaction Menu, Task Modal, Fact Modal & Upgrade Celebration */}
       {phase === "playing" && (
         <StructureInteractModal
           t={t}
@@ -300,11 +407,7 @@ export default function App() {
             playSfx("click");
             setShowUpgradeModal(false);
           }}
-          onStartQuiz={() => {
-            playSfx("click");
-            setShowUpgradeModal(false);
-            setPhase("quiz");
-          }}
+          onStartQuiz={handleStartReturnCutscene}
           onLocateNextTask={handleLocateNextTask}
           onPlaySfx={playSfx}
         />
@@ -322,7 +425,7 @@ export default function App() {
         />
       )}
 
-      {/* Streamlined 4-Question Debrief Quiz (with 30s Timer, 1.-4. & a.-d. formatting) */}
+      {/* Streamlined 4-Question Debrief Quiz */}
       {phase === "quiz" && (
         <QuizModal
           t={t}
@@ -350,7 +453,7 @@ export default function App() {
           }}
           onPlayAgain={() => {
             playSfx("click");
-            resetMission("start");
+            resetMission("title");
           }}
           onPlaySfx={playSfx}
         />
@@ -369,7 +472,7 @@ export default function App() {
           }}
           onPlayAgain={() => {
             playSfx("click");
-            resetMission("start");
+            resetMission("title");
           }}
           onOpenNasa={() => {
             playSfx("click");
@@ -378,7 +481,7 @@ export default function App() {
         />
       )}
 
-      {/* Settings Modal */}
+      {/* Settings Modal (Audio Volume, Camera Sensitivity, Graphics Quality, Language) */}
       {showSettings && (
         <SettingsModal
           t={t}
@@ -389,9 +492,29 @@ export default function App() {
           }}
           soundOn={soundOn}
           onToggleSound={handleToggleSound}
+          volume={volume}
+          onChangeVolume={handleChangeVolume}
+          cameraSensitivity={cameraSensitivity}
+          onChangeSensitivity={setCameraSensitivity}
+          graphicsQuality={graphicsQuality}
+          onChangeGraphics={(q) => {
+            playSfx("click");
+            setGraphicsQuality(q);
+          }}
           onClose={() => {
             playSfx("click");
             setShowSettings(false);
+          }}
+        />
+      )}
+
+      {/* Credits Modal */}
+      {showCredits && (
+        <CreditsModal
+          t={t}
+          onClose={() => {
+            playSfx("click");
+            setShowCredits(false);
           }}
         />
       )}
