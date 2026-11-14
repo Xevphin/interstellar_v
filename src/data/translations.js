@@ -1,13 +1,13 @@
 export const TRANSLATIONS = {
   en: {
-    gameTitle: "Interstellar V: Lunar & Mars Outpost",
-    heroTagline: "6-Day Outpost Resource & Rover Survival",
-    choosePlanet: "Select Your 6-Day Outpost Mission",
+    gameTitle: "Blast Off!",
+    heroTagline: "Outpost Resource & Rover Survival",
+    choosePlanet: "Select Your Outpost Mission",
     lunarTitle: "Moon: Shackleton Lunar Outpost",
-    lunarSubtitle: "6-Day Lunar Outpost Survival Mission",
+    lunarSubtitle: "Lunar Outpost Survival Mission",
     lunarCTA: "Launch Lunar Outpost",
     marsTitle: "Mars: Jezero Crater Outpost",
-    marsSubtitle: "6-Day Mars Crater Survival Variant",
+    marsSubtitle: "Mars Crater Survival Variant",
     marsCTA: "Launch Mars Outpost",
     settings: "Settings",
     language: "Language",
@@ -16,8 +16,6 @@ export const TRANSLATIONS = {
     soundOff: "Off",
     close: "Close",
     nasaDataBtn: "NASA Science & Data",
-    solLabel: "Day",
-    ofSix: "of 6",
     tasksLabel: "Tasks",
     resources: {
       power: "Power",
@@ -36,7 +34,7 @@ export const TRANSLATIONS = {
       title: "Outpost Structure Controls",
       subtitle: "Choose an action for this outpost module:",
       taskBtn: "Task",
-      taskDesc: "Manage resources & make a key Day decision (30s timer)",
+      taskDesc: "Manage resources & make a key outpost decision (30s timer)",
       taskDoneBadge: "Completed",
       factBtn: "Fact",
       factDesc: "Read Dr. Farah's space science fact about this structure",
@@ -55,15 +53,15 @@ export const TRANSLATIONS = {
       badge: "Mission Scientist Briefing",
       title: "Welcome aboard, Commander! I’m Dr. Farah.",
       coreQuote:
-        "Today we’re going to learn how to manage Lunar Outpost in 6 days with the resources that we need to balance for. Here is the big secret of space: every choice helps one thing and costs another. There is no free choice!",
-      howToPlayTitle: "How to Complete Your 6-Day Mission:",
+        "Today we’re going to learn how to manage Lunar Outpost with the resources that we need to balance for. Here is the big secret of space: every choice helps one thing and costs another. There is no free choice!",
+      howToPlayTitle: "How to Complete Your Outpost Mission:",
       steps: [
         "Drive your rover using WASD / Arrow Keys (or the on-screen D-Pad) to all 6 Outpost Structures.",
         "When you get close to a structure, press [E] to open the Action Menu: Task, Fact, or Exit.",
         "Each Task gives you 30 seconds to weigh the trade-offs. Click my AI Helper button anytime for a hint!",
         "Complete all 6 structure Tasks to unlock the Super Rover Upgrade and the final Debrief Quiz!",
       ],
-      startBtn: "Begin Day 1 Exploration",
+      startBtn: "Begin Exploration",
     },
     aiHelper: {
       buttonLabel: "Ask Dr. Farah AI",
@@ -90,7 +88,7 @@ export const TRANSLATIONS = {
     },
     sols: {
       1: {
-        title: "Day 1 Task: Oxygen Extractor Unit",
+        title: "Task: Oxygen Extractor Unit",
         context:
           "Space has no breathable air! Our extractor pulls oxygen from lunar regolith and CO₂ (like NASA's MOXIE), but requires heavy battery power.",
         drFarahTip:
@@ -106,13 +104,13 @@ export const TRANSLATIONS = {
         choiceB: "Save Power & Use Backup Air",
       },
       2: {
-        title: "Day 2 Task: Hydroponic Greenhouse Dome",
+        title: "Task: Hydroponic Greenhouse Dome",
         context:
           "Space soil has harsh minerals (and perchlorate salts on Mars) that hurt crops unless we filter the water and heat the greenhouse.",
         drFarahTip:
           "Space potatoes give us vital Food, though diverting power from the dome reduces Shielding!",
         hint:
-          "Look at your Green (Food) and Indigo (Shielding) gauges. Tomorrow brings a space weather storm—will your shields be ready?",
+          "Look at your Green (Food) and Indigo (Shielding) gauges. Space weather storms can strike anytime—will your shields be ready?",
         tradeoff:
           "Option A boosts Food (+▲) by diverting power from Shielding (-▼). Option B strengthens Shielding (+▲) while rationing snacks (-▼ Food).",
         factTitle: "Science Fact: Space Farming & Hydroponics",
@@ -122,7 +120,7 @@ export const TRANSLATIONS = {
         choiceB: "Keep Shields Max & Ration Snacks",
       },
       3: {
-        title: "Day 3 Task: NASA DONKI Solar Storm Alert",
+        title: "Task: NASA DONKI Solar Storm Alert",
         context:
           "NASA's DONKI space weather tracker spots a solar storm incoming! Deep-space comms have a delay—you must decide how to protect the outpost right now!",
         drFarahTip:
@@ -138,13 +136,13 @@ export const TRANSLATIONS = {
         choiceB: "Keep Air Scrubbers Full Speed",
       },
       4: {
-        title: "Day 4 Task: Electrostatic Dust on Solar Panels",
+        title: "Task: Electrostatic Dust on Solar Panels",
         context:
           "Abrasive crater dust coated our solar array, cutting battery charging! Sending a crew outside to brush them off uses suit air and food energy.",
         drFarahTip:
-          "Clean solar panels give a huge Power surge for the final two days!",
+          "Clean solar panels give a huge Power surge for the outpost!",
         hint:
-          "Days 5 and 6 will need plenty of Power for labs and night heaters. Can your Oxygen and Food handle an outdoor cleaning walk?",
+          "Outpost labs and thermal heaters need plenty of Power. Can your Oxygen and Food handle an outdoor cleaning walk?",
         tradeoff:
           "Option A cleans the panels for a big Power boost (+▲) at the cost of Oxygen (-▼) and Food (-▼). Option B stays inside (+▲ Food) but loses Power (-▼).",
         factTitle: "Science Fact: Clingy Crater Dust",
@@ -154,7 +152,7 @@ export const TRANSLATIONS = {
         choiceB: "Stay Inside on Low Power",
       },
       5: {
-        title: "Day 5 Task: NASA OSDR Bio-Algae Lab",
+        title: "Task: NASA OSDR Bio-Algae Lab",
         context:
           "Mission Control asks us to run a green algae bioreactor from NASA's OSDR space-biology lab to generate extra oxygen in low gravity.",
         drFarahTip:
@@ -170,13 +168,13 @@ export const TRANSLATIONS = {
         choiceB: "Skip Test & Save Supplies",
       },
       6: {
-        title: "Day 6 Task: Freezing Crater Night (-85°C to -130°C)",
+        title: "Task: Freezing Crater Night (-85°C to -130°C)",
         context:
-          "Sensors read freezing night temperatures outside the crater! Balance the thermal heaters until the relief lander touches down at sunrise!",
+          "Sensors read freezing night temperatures outside the crater! Balance the thermal heaters until the relief lander touches down!",
         drFarahTip:
-          "Final day, Commander! Pick the option that keeps all four gauges above 0%!",
+          "Keep all four resource gauges above 0% to protect the crew!",
         hint:
-          "This is the final test! Look closely at your four resource bars—pick the choice that won't push your lowest bar to 0%.",
+          "Look closely at your four resource bars—pick the choice that won't push your lowest bar to 0%.",
         tradeoff:
           "Option A spreads the load evenly across Power (-▼), Oxygen (-▼), and Shielding (-▼). Option B drains more Power (-▼) and Food (-▼) while sparing Oxygen and Shields.",
         factTitle: "Science Fact: Extreme Crater Nights",
@@ -188,10 +186,10 @@ export const TRANSLATIONS = {
     },
     lose: {
       title: "Mission Paused — Outpost Resource Depleted!",
-      retryBtn: "Try Again from Day 1",
+      retryBtn: "Try Again",
       tips: {
         power:
-          "Our Power hit 0%! Remember my big secret of space: every choice helps one thing and costs another. Next run, clean the solar panels on Day 4 or conserve battery power!",
+          "Our Power hit 0%! Remember my big secret of space: every choice helps one thing and costs another. Next run, clean the solar panels or conserve battery power!",
         oxygen:
           "Our Oxygen hit 0%! Crew members need steady breathable air from the extractor and algae lab. Watch the cyan Oxygen gauge closely!",
         shielding:
@@ -268,8 +266,8 @@ export const TRANSLATIONS = {
       ],
     },
     leaderboard: {
-      title: "Lunar Outpost Commander Leaderboard",
-      subtitle: "Compare your 6-Day Outpost performance against top Commanders!",
+      title: "Outpost Commander Leaderboard",
+      subtitle: "Compare your Outpost performance against top Commanders!",
       totalScoreLabel: "Total Mission Score",
       breakdown: {
         resources: "Resource Balance",
@@ -295,7 +293,7 @@ export const TRANSLATIONS = {
       namePlaceholder: "Enter Commander Name...",
       defaultName: "Space Commander",
       completedLine:
-        "For mastering resource trade-offs across 6 Days at the Lunar & Mars Outpost!",
+        "For mastering resource trade-offs at the Lunar & Mars Outpost!",
       finalStats: "Final Outpost Status",
       badgeLabel: "Specialty Rank",
       badges: {
@@ -331,14 +329,14 @@ export const TRANSLATIONS = {
   },
 
   ms: {
-    gameTitle: "Interstellar V: Pangkalan Bulan & Marikh",
-    heroTagline: "Kembara 6-Hari Pengurusan Sumber & Rover",
-    choosePlanet: "Pilih Misi Pangkalan 6-Hari Anda",
+    gameTitle: "Blast Off!",
+    heroTagline: "Kembara Pengurusan Sumber & Rover",
+    choosePlanet: "Pilih Misi Pangkalan Anda",
     lunarTitle: "Bulan: Pangkalan Kawah Shackleton",
-    lunarSubtitle: "Misi Hidup Pangkalan Bulan 6-Hari",
+    lunarSubtitle: "Misi Hidup Pangkalan Bulan",
     lunarCTA: "Mulakan Misi Bulan",
     marsTitle: "Marikh: Pangkalan Kawah Jezero",
-    marsSubtitle: "Variasi Misi Kawah Marikh 6-Hari",
+    marsSubtitle: "Variasi Misi Kawah Marikh",
     marsCTA: "Mulakan Misi Marikh",
     settings: "Tetapan",
     language: "Bahasa",
@@ -347,8 +345,6 @@ export const TRANSLATIONS = {
     soundOff: "Mati",
     close: "Tutup",
     nasaDataBtn: "Sains & Data NASA",
-    solLabel: "Hari",
-    ofSix: "drp 6",
     tasksLabel: "Tugasan",
     resources: {
       power: "Tenaga",
@@ -386,15 +382,15 @@ export const TRANSLATIONS = {
       badge: "Taklimat Saintis Misi",
       title: "Selamat datang, Komander! Saya Dr. Farah.",
       coreQuote:
-        "Today we’re going to learn how to manage Lunar Outpost in 6 days with the resources that we need to balance for. Here is the big secret of space: every choice helps one thing and costs another. There is no free choice!",
-      howToPlayTitle: "Cara Menyelesaikan Misi 6-Hari Anda:",
+        "Hari ini kita akan belajar mengurus Pangkalan Bulan dengan sumber yang perlu kita imbangi. Inilah rahsia besar angkasa: setiap pilihan membantu satu perkara dan mengorbankan yang lain. Tiada pilihan percuma!",
+      howToPlayTitle: "Cara Menyelesaikan Misi Pangkalan Anda:",
       steps: [
         "Pandu rover anda guna kekunci WASD / Anak Panah (atau D-Pad skrin) ke semua 6 Struktur Pangkalan.",
         "Apabila dekat dengan struktur, tekan [E] untuk buka Menu Tindakan: Task, Fact, atau Exit.",
         "Setiap Task memberi masa 30 saat untuk membuat keputusan. Klik butang Pembantu AI saya untuk petunjuk!",
         "Selesaikan semua 6 Task struktur untuk membuka Naik Taraf Super Rover dan Kuiz Akhir!",
       ],
-      startBtn: "Mula Penerokaan Hari 1",
+      startBtn: "Mula Penerokaan",
     },
     aiHelper: {
       buttonLabel: "Tanya AI Dr. Farah",
@@ -421,7 +417,7 @@ export const TRANSLATIONS = {
     },
     sols: {
       1: {
-        title: "Tugasan Hari 1: Unit Penjana Oksigen",
+        title: "Tugasan: Unit Penjana Oksigen",
         context:
           "Tiada udara bernafas di angkasa! Mesin kita mengekstrak oksigen daripada batuan bulan & CO₂ (seperti MOXIE NASA), tetapi memerlukan kuasa bateri tinggi.",
         drFarahTip:
@@ -437,13 +433,13 @@ export const TRANSLATIONS = {
         choiceB: "Jimat Tenaga & Guna Udara Simpanan",
       },
       2: {
-        title: "Tugasan Hari 2: Kubah Rumah Hijau Hidroponik",
+        title: "Tugasan: Kubah Rumah Hijau Hidroponik",
         context:
           "Tanah angkasa perlu ditapis dan rumah hijau perlu dipanaskan supaya tanaman kentang angkasa tumbuh subur.",
         drFarahTip:
           "Kentang angkasa memberi Makanan penting, tetapi meminjam kuasa daripada kubah mengurangkan Perisai!",
         hint:
-          "Perhatikan bar Makanan (Hijau) dan Perisai (Biru/Ungu). Esok ada amaran ribut suria—adakah perisai anda cukup kuat?",
+          "Perhatikan bar Makanan (Hijau) dan Perisai (Biru/Ungu). Amaran ribut suria boleh berlaku bila-bila masa—adakah perisai anda cukup kuat?",
         tradeoff:
           "Pilihan A menambah Makanan (+▲) tetapi mengurangkan Perisai (-▼). Pilihan B menguatkan Perisai (+▲) sambil mencatu snek (-▼ Makanan).",
         factTitle: "Fakta Sains: Pertanian Angkasa & Hidroponik",
@@ -453,7 +449,7 @@ export const TRANSLATIONS = {
         choiceB: "Kekalkan Perisai & Catuan Snek",
       },
       3: {
-        title: "Tugasan Hari 3: Amaran Ribut Suria DONKI NASA",
+        title: "Tugasan: Amaran Ribut Suria DONKI NASA",
         context:
           "Sistem cuaca angkasa DONKI NASA mengesan ribut suria! Anda perlu membuat keputusan pantas untuk melindungi pangkalan sekarang!",
         drFarahTip:
@@ -469,13 +465,13 @@ export const TRANSLATIONS = {
         choiceB: "Kekalkan Penapis Udara Laju Penuh",
       },
       4: {
-        title: "Tugasan Hari 4: Debu Elektrostatik di Panel Suria",
+        title: "Tugasan: Debu Elektrostatik di Panel Suria",
         context:
           "Debu kawah menyaluti panel suria kita dan melambatkan pengecasan bateri! Membersihkannya di luar menggunakan oksigen sut dan tenaga makanan.",
         drFarahTip:
-          "Panel suria yang bersih memberikan lonjakan Tenaga besar untuk dua hari terakhir!",
+          "Panel suria yang bersih memberikan lonjakan Tenaga besar untuk pangkalan!",
         hint:
-          "Hari 5 dan 6 memerlukan banyak Tenaga untuk makmal dan pemanas malam. Adakah Oksigen dan Makanan anda mencukupi untuk kerja luar?",
+          "Makmal dan pemanas memerlukan banyak Tenaga. Adakah Oksigen dan Makanan anda mencukupi untuk kerja luar?",
         tradeoff:
           "Pilihan A membersihkan panel untuk Tenaga tinggi (+▲) dengan kos Oksigen (-▼) dan Makanan (-▼). Pilihan B kekal di dalam (+▲ Makanan) tetapi hilang Tenaga (-▼).",
         factTitle: "Fakta Sains: Debu Kawah Berlekatan",
@@ -485,7 +481,7 @@ export const TRANSLATIONS = {
         choiceB: "Kekal di Dalam Dengan Kuasa Rendah",
       },
       5: {
-        title: "Tugasan Hari 5: Makmal Bio-Alga OSDR NASA",
+        title: "Tugasan: Makmal Bio-Alga OSDR NASA",
         context:
           "Pusat Kawalan meminta kita menjalankan bioreaktor alga hijau dari makmal OSDR NASA untuk menghasilkan oksigen tambahan dalam graviti rendah.",
         drFarahTip:
@@ -501,13 +497,13 @@ export const TRANSLATIONS = {
         choiceB: "Langkau Ujian & Simpan Bekalan",
       },
       6: {
-        title: "Tugasan Hari 6: Malam Kawah Sejuk Beku (-85°C hingga -130°C)",
+        title: "Tugasan: Malam Kawah Sejuk Beku (-85°C hingga -130°C)",
         context:
-          "Sensor mencatat suhu malam sejuk melampau di luar kawah! Imbangkan pemanas haba sehingga roket penyelamat mendarat waktu subuh!",
+          "Sensor mencatat suhu malam sejuk melampau di luar kawah! Imbangkan pemanas haba sehingga roket penyelamat mendarat!",
         drFarahTip:
-          "Hari terakhir, Komander! Pilih tindakan yang memastikan keempat-empat bar kekal di atas 0%!",
+          "Pastikan keempat-empat bar sumber kekal di atas 0%!",
         hint:
-          "Ini ujian terakhir! Perhatikan keempat-empat bar sumber anda—pilih pilihan yang tidak menolak bar terendah anda ke 0%.",
+          "Perhatikan keempat-empat bar sumber anda—pilih pilihan yang tidak menolak bar terendah anda ke 0%.",
         tradeoff:
           "Pilihan A mengagihkan beban secara seimbang pada Tenaga (-▼), Oksigen (-▼), dan Perisai (-▼). Pilihan B menggunakan lebih Tenaga (-▼) dan Makanan (-▼).",
         factTitle: "Fakta Sains: Suhu Malam Kawah Ekstrem",
@@ -519,10 +515,10 @@ export const TRANSLATIONS = {
     },
     lose: {
       title: "Misi Dijeda — Sumber Pangkalan Kehabisan!",
-      retryBtn: "Cuba Lagi dari Hari 1",
+      retryBtn: "Cuba Lagi",
       tips: {
         power:
-          "Tenaga kita mencecah 0%! Ingat rahsia angkasa saya: setiap pilihan membantu satu perkara dan mengorbankan yang lain. Cuba bersihkan panel suria pada Hari 4!",
+          "Tenaga kita mencecah 0%! Ingat rahsia angkasa saya: setiap pilihan membantu satu perkara dan mengorbankan yang lain. Cuba bersihkan panel suria atau jimatkan bateri!",
         oxygen:
           "Oksigen kita mencecah 0%! Kru memerlukan udara segar daripada penjana oksigen dan makmal alga.",
         shielding:
@@ -599,8 +595,8 @@ export const TRANSLATIONS = {
       ],
     },
     leaderboard: {
-      title: "Papan Pendahulu Komander Pangkalan Bulan",
-      subtitle: "Bandingkan prestasi 6-Hari anda dengan Komander terbaik!",
+      title: "Papan Pendahulu Komander Pangkalan",
+      subtitle: "Bandingkan prestasi pangkalan anda dengan Komander terbaik!",
       totalScoreLabel: "Jumlah Skor Misi",
       breakdown: {
         resources: "Baki Sumber",
@@ -626,7 +622,7 @@ export const TRANSLATIONS = {
       namePlaceholder: "Masukkan Nama Komander...",
       defaultName: "Komander Angkasa",
       completedLine:
-        "Kerana berjaya menguruskan sumber selama 6 Hari di Pangkalan Bulan & Marikh!",
+        "Kerana berjaya menguruskan sumber di Pangkalan Bulan & Marikh!",
       finalStats: "Status Akhir Pangkalan",
       badgeLabel: "Pangkat Kepakaran",
       badges: {
@@ -638,7 +634,7 @@ export const TRANSLATIONS = {
       printBtn: "Cetak / Simpan PDF",
       downloadBtn: "Muat Turun PNG",
       backToLeaderboard: "Kembali ke Papan Pendahulu",
-      playAgainBtn: "Main Semula",
+      playAgainBtn: "Play Again",
     },
     nasaModal: {
       title: "Sains & Data NASA",

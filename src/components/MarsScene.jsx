@@ -185,7 +185,7 @@ function StructureBeacon({ structure, isNearby, isCompleted, label, interactProm
             <span>[E] {label}</span>
           ) : (
             <span>
-              {isCompleted ? "✓ " : `Day ${structure.day}: `}
+              {isCompleted ? "✓ " : ""}
               {label}
             </span>
           )}

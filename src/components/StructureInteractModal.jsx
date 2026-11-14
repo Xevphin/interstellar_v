@@ -143,7 +143,7 @@ export default function StructureInteractModal({
             <DrFarahPortrait mood={drFarahMood} size="sm" />
             <div>
               <div className="text-[11px] font-extrabold uppercase tracking-wider text-cyan-300">
-                {t.actionMenu.title} • {t.solLabel} {activeStructure.day}
+                {t.actionMenu.title}
               </div>
               <h2 className="font-display text-lg sm:text-xl font-bold text-white">
                 {structName}

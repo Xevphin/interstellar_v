@@ -7,6 +7,7 @@ import LaunchCutscene from "./components/cutscenes/LaunchCutscene";
 import ReturnCutscene from "./components/cutscenes/ReturnCutscene";
 import HUD from "./components/HUD";
 import IntroGreetingModal from "./components/IntroGreetingModal";
+import LunarCockpitTask from "./components/LunarCockpitTask";
 import StructureInteractModal from "./components/StructureInteractModal";
 import {
   QuizModal,
@@ -146,6 +147,20 @@ export default function App() {
 
   const handleStartExploration = () => {
     playSfx("click");
+    if (planet === "lunar") {
+      // On the Moon, complete the Rocket Cockpit Situational Task first before exiting to the basecamp
+      setPhase("cockpitTask");
+    } else {
+      setPhase("playing");
+    }
+  };
+
+  const handleCompleteCockpitTask = (choiceKey) => {
+    if (choiceKey === "A") {
+      setStats({ power: 85, oxygen: 90, shielding: 90, food: 100 });
+    } else {
+      setStats({ power: 70, oxygen: 100, shielding: 100, food: 85 });
+    }
     setPhase("playing");
   };
 
@@ -253,9 +268,12 @@ export default function App() {
   const isRoverPaused =
     phase !== "playing" || Boolean(interactionMode) || showUpgradeModal;
 
-  const showTitleScene = phase === "title" || phase === "select";
+  const showTitleScene =
+    phase === "title" ||
+    phase === "select" ||
+    (phase === "intro" && planet === "lunar");
   const showOutpostScene =
-    phase === "intro" ||
+    (phase === "intro" && planet === "mars") ||
     phase === "playing" ||
     phase === "lost" ||
     phase === "quiz" ||
@@ -353,6 +371,15 @@ export default function App() {
           t={t}
           planet={planet}
           onStartExploration={handleStartExploration}
+          onPlaySfx={playSfx}
+        />
+      )}
+
+      {/* Moon Pre-Basecamp Rocket Cockpit Situational Task */}
+      {phase === "cockpitTask" && (
+        <LunarCockpitTask
+          t={t}
+          onCompleteCockpitTask={handleCompleteCockpitTask}
           onPlaySfx={playSfx}
         />
       )}
