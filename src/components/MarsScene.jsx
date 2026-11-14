@@ -33,10 +33,10 @@ function CraterTerrain({ planet }) {
       pos.setY(i, y);
 
       if (isLunar) {
-        if (y < 0.4) c.set("#475569");
-        else if (y < 2.2) c.set("#64748b");
-        else if (y < 5.0) c.set("#334155");
-        else c.set("#1e293b");
+        if (y < 0.4) c.set("#94a3b8");
+        else if (y < 2.2) c.set("#cbd5e1");
+        else if (y < 5.0) c.set("#64748b");
+        else c.set("#475569");
       } else {
         if (y < 0.4) c.set("#a84829");
         else if (y < 2.2) c.set("#be5533");
@@ -84,8 +84,8 @@ function CraterTerrain({ planet }) {
         <mesh key={idx} position={r.pos} scale={r.scale} rotation={r.rot} castShadow receiveShadow>
           <dodecahedronGeometry args={[1, 0]} />
           <meshStandardMaterial
-            color={isLunar ? "#334155" : "#7d311a"}
-            roughness={0.9}
+            color={isLunar ? "#94a3b8" : "#7d311a"}
+            roughness={0.85}
             flatShading
           />
         </mesh>
@@ -894,7 +894,7 @@ export default function MarsScene({
   const isLunar = planet === "lunar";
   const isNight = phase === "playing" && currentSol === 6;
   const solarStorm = phase === "playing" && currentSol === 3;
-  const skyColor = isLunar ? "#070b16" : isNight ? "#090f20" : "#c86d51";
+  const skyColor = isLunar ? "#0b1326" : isNight ? "#090f20" : "#c86d51";
   const high = graphicsQuality === "high";
 
   return (
@@ -905,16 +905,16 @@ export default function MarsScene({
         camera={{ position: [0, 8.5, 16], fov: 52 }}
       >
         <color attach="background" args={[skyColor]} />
-        <fogExp2 attach="fog" args={[skyColor, isLunar ? 0.008 : 0.013]} />
+        <fogExp2 attach="fog" args={[skyColor, isLunar ? 0.0045 : 0.013]} />
 
         <ambientLight
-          intensity={isLunar ? 0.55 : isNight ? 0.38 : 0.68}
-          color={isLunar ? "#e2e8f0" : isNight ? "#93c5fd" : "#ffedd5"}
+          intensity={isLunar ? 1.05 : isNight ? 0.38 : 0.68}
+          color={isLunar ? "#f1f5f9" : isNight ? "#93c5fd" : "#ffedd5"}
         />
         <directionalLight
           position={[18, 24, 14]}
-          intensity={isLunar ? 1.9 : isNight ? 0.5 : 1.75}
-          color={isLunar ? "#f8fafc" : "#fff7ed"}
+          intensity={isLunar ? 2.45 : isNight ? 0.5 : 1.75}
+          color={isLunar ? "#ffffff" : "#fff7ed"}
           castShadow={high}
           shadow-mapSize={high ? [1024, 1024] : [512, 512]}
           shadow-camera-left={-26}
