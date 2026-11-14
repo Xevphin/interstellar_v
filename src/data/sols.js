@@ -7,10 +7,12 @@ export const INITIAL_STATS = {
 
 export const RESOURCE_KEYS = ["power", "oxygen", "shielding", "food"];
 
-export const SOL_DATA = [
+export const OUTPOST_STRUCTURES = [
   {
-    id: 1,
-    focusModule: "moxie",
+    id: "moxie",
+    day: 1,
+    position: [-9.5, 0, -4.5],
+    interactionRadius: 5.2,
     event: "normal",
     choiceA: {
       effects: { oxygen: 20, power: -20 },
@@ -20,8 +22,10 @@ export const SOL_DATA = [
     },
   },
   {
-    id: 2,
-    focusModule: "greenhouse",
+    id: "greenhouse",
+    day: 2,
+    position: [-7.5, 0, 7.5],
+    interactionRadius: 5.2,
     event: "normal",
     choiceA: {
       effects: { food: 20, shielding: -20 },
@@ -31,8 +35,10 @@ export const SOL_DATA = [
     },
   },
   {
-    id: 3,
-    focusModule: "habitat",
+    id: "comms",
+    day: 3,
+    position: [0, 0, -11.5],
+    interactionRadius: 5.2,
     event: "solarStorm",
     choiceA: {
       effects: { shielding: 25, power: -20, oxygen: -10 },
@@ -42,8 +48,10 @@ export const SOL_DATA = [
     },
   },
   {
-    id: 4,
-    focusModule: "solar",
+    id: "solar",
+    day: 4,
+    position: [9.5, 0, -4.5],
+    interactionRadius: 5.2,
     event: "dustDevil",
     choiceA: {
       effects: { power: 25, oxygen: -15, food: -10 },
@@ -55,8 +63,10 @@ export const SOL_DATA = [
     },
   },
   {
-    id: 5,
-    focusModule: "greenhouse",
+    id: "algae",
+    day: 5,
+    position: [8.0, 0, 7.5],
+    interactionRadius: 5.2,
     event: "normal",
     choiceA: {
       effects: { oxygen: 25, power: -15, food: -10 },
@@ -66,8 +76,10 @@ export const SOL_DATA = [
     },
   },
   {
-    id: 6,
-    focusModule: "habitat",
+    id: "habitat",
+    day: 6,
+    position: [0, 0, 0],
+    interactionRadius: 5.8,
     event: "freezingNight",
     choiceA: {
       effects: { power: -15, oxygen: -10, shielding: -10 },
@@ -76,4 +88,12 @@ export const SOL_DATA = [
       effects: { power: -25, food: -15 },
     },
   },
+];
+
+export const DEFAULT_BENCHMARKS = [
+  { name: "Cmdr. Dr. Farah", score: 3450, tasks: 6, quiz: "4/4", isBenchmark: true },
+  { name: "Capt. Neil S.", score: 3120, tasks: 6, quiz: "4/4", isBenchmark: true },
+  { name: "Lt. Aisyah R.", score: 2780, tasks: 6, quiz: "3/4", isBenchmark: true },
+  { name: "Cadet Leo M.", score: 2390, tasks: 5, quiz: "3/4", isBenchmark: true },
+  { name: "Ensign Mei L.", score: 1950, tasks: 4, quiz: "2/4", isBenchmark: true },
 ];

@@ -1,5 +1,14 @@
 import React from "react";
-import { Settings, RotateCcw, Gamepad2, Sparkles, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from "lucide-react";
+import {
+  Settings,
+  Gamepad2,
+  Sparkles,
+  ArrowUp,
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  Zap,
+} from "lucide-react";
 
 const GAUGE_META = [
   { key: "power", icon: "⚡", bar: "bg-amber-400", text: "text-amber-300", border: "border-amber-400/30" },
@@ -10,11 +19,13 @@ const GAUGE_META = [
 
 export default function HUD({
   t,
+  planet,
   currentSol,
+  completedTasksCount,
+  roverUpgraded,
   stats,
   roverMode,
   onToggleRoverMode,
-  onResetCam,
   onOpenSettings,
   onOpenNasa,
   onDpadChange,
@@ -28,16 +39,22 @@ export default function HUD({
       {/* Top HUD Bar */}
       <div className="fixed top-0 inset-x-0 z-20 p-3 sm:p-4 pointer-events-none">
         <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2.5">
-          {/* Sol Counter */}
-          <div className="pointer-events-auto flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-slate-900/80 backdrop-blur-md border border-white/15 shadow-lg">
-            <span className="text-lg">🔴</span>
+          {/* Day & Task Counter */}
+          <div className="pointer-events-auto flex items-center gap-3 px-3.5 py-2 rounded-2xl bg-slate-900/85 backdrop-blur-md border border-white/15 shadow-lg">
+            <span className="text-xl">{planet === "lunar" ? "🌕" : "🔴"}</span>
             <div>
-              <div className="text-[10px] font-extrabold uppercase tracking-wider text-orange-300">
-                Jezero Crater
-              </div>
-              <div className="font-display text-base sm:text-lg font-bold text-white leading-tight">
-                {t.solLabel} {currentSol}{" "}
-                <span className="text-xs font-semibold text-slate-400">{t.ofSix}</span>
+              <div className="flex items-center gap-2">
+                <span className="font-display text-sm sm:text-base font-bold text-white">
+                  {t.solLabel} {currentSol} <span className="text-xs text-slate-400">{t.ofSix}</span>
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-[11px] font-extrabold">
+                  {t.tasksLabel}: {completedTasksCount}/6
+                </span>
+                {roverUpgraded && (
+                  <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-400/20 border border-amber-300/50 text-amber-300 text-[10px] font-extrabold uppercase">
+                    <Zap className="w-3 h-3" /> MK-II
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -50,7 +67,7 @@ export default function HUD({
               return (
                 <div
                   key={g.key}
-                  className={`px-3 py-2 rounded-2xl bg-slate-900/80 backdrop-blur-md border ${
+                  className={`px-3 py-2 rounded-2xl bg-slate-900/85 backdrop-blur-md border ${
                     isLow ? "border-rose-500/80 animate-pulse" : g.border
                   } shadow-lg`}
                 >
@@ -79,31 +96,24 @@ export default function HUD({
             <button
               type="button"
               onClick={onToggleRoverMode}
-              title={t.roverMode}
+              title={roverMode ? t.roverMode : t.freeCamMode}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-2xl backdrop-blur-md border text-xs font-bold transition shadow-lg ${
                 roverMode
-                  ? "bg-cyan-500 text-slate-950 border-cyan-300"
-                  : "bg-slate-900/80 hover:bg-slate-800 text-slate-100 border-white/15"
+                  ? "bg-cyan-400 text-slate-950 border-cyan-300"
+                  : "bg-slate-900/85 hover:bg-slate-800 text-slate-100 border-white/15"
               }`}
             >
               <Gamepad2 className="w-4 h-4" />
-              <span className="hidden md:inline">{t.roverMode}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={onResetCam}
-              title={t.resetCam}
-              className="p-2.5 rounded-2xl bg-slate-900/80 hover:bg-slate-800 backdrop-blur-md border border-white/15 text-slate-100 transition shadow-lg"
-            >
-              <RotateCcw className="w-4 h-4" />
+              <span className="hidden md:inline">
+                {roverMode ? t.roverMode : t.freeCamMode}
+              </span>
             </button>
 
             <button
               type="button"
               onClick={onOpenNasa}
               title={t.nasaDataBtn}
-              className="p-2.5 rounded-2xl bg-slate-900/80 hover:bg-slate-800 backdrop-blur-md border border-white/15 text-sky-300 transition shadow-lg"
+              className="p-2.5 rounded-2xl bg-slate-900/85 hover:bg-slate-800 backdrop-blur-md border border-white/15 text-sky-300 transition shadow-lg"
             >
               <Sparkles className="w-4 h-4" />
             </button>
@@ -112,7 +122,7 @@ export default function HUD({
               type="button"
               onClick={onOpenSettings}
               title={t.settings}
-              className="p-2.5 rounded-2xl bg-slate-900/80 hover:bg-slate-800 backdrop-blur-md border border-white/15 text-amber-300 transition shadow-lg"
+              className="p-2.5 rounded-2xl bg-slate-900/85 hover:bg-slate-800 backdrop-blur-md border border-white/15 text-amber-300 transition shadow-lg"
             >
               <Settings className="w-4 h-4" />
             </button>
@@ -120,52 +130,47 @@ export default function HUD({
         </div>
       </div>
 
-      {/* Rover Mode On-Screen D-Pad */}
-      {roverMode && (
-        <div className="fixed right-4 bottom-48 sm:bottom-52 z-20 flex flex-col items-center gap-1.5 pointer-events-auto">
-          <div className="px-2.5 py-1 rounded-full bg-slate-900/80 border border-cyan-400/40 text-[11px] font-bold text-cyan-200 mb-1">
-            {t.roverHint}
-          </div>
+      {/* On-Screen D-Pad for Touch / Click Driving */}
+      <div className="fixed right-4 bottom-32 sm:bottom-28 z-20 flex flex-col items-center gap-1.5 pointer-events-auto">
+        <button
+          type="button"
+          onPointerDown={() => setDpad("up", true)}
+          onPointerUp={() => setDpad("up", false)}
+          onPointerLeave={() => setDpad("up", false)}
+          className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900/85 active:bg-cyan-400 active:text-slate-950 border border-white/20 flex items-center justify-center shadow-lg"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </button>
+        <div className="flex gap-1.5">
           <button
             type="button"
-            onPointerDown={() => setDpad("up", true)}
-            onPointerUp={() => setDpad("up", false)}
-            onPointerLeave={() => setDpad("up", false)}
-            className="w-11 h-11 rounded-xl bg-slate-900/85 active:bg-cyan-500 active:text-slate-950 border border-white/20 flex items-center justify-center shadow-lg"
+            onPointerDown={() => setDpad("left", true)}
+            onPointerUp={() => setDpad("left", false)}
+            onPointerLeave={() => setDpad("left", false)}
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900/85 active:bg-cyan-400 active:text-slate-950 border border-white/20 flex items-center justify-center shadow-lg"
           >
-            <ArrowUp className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5" />
           </button>
-          <div className="flex gap-1.5">
-            <button
-              type="button"
-              onPointerDown={() => setDpad("left", true)}
-              onPointerUp={() => setDpad("left", false)}
-              onPointerLeave={() => setDpad("left", false)}
-              className="w-11 h-11 rounded-xl bg-slate-900/85 active:bg-cyan-500 active:text-slate-950 border border-white/20 flex items-center justify-center shadow-lg"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <button
-              type="button"
-              onPointerDown={() => setDpad("down", true)}
-              onPointerUp={() => setDpad("down", false)}
-              onPointerLeave={() => setDpad("down", false)}
-              className="w-11 h-11 rounded-xl bg-slate-900/85 active:bg-cyan-500 active:text-slate-950 border border-white/20 flex items-center justify-center shadow-lg"
-            >
-              <ArrowDown className="w-5 h-5" />
-            </button>
-            <button
-              type="button"
-              onPointerDown={() => setDpad("right", true)}
-              onPointerUp={() => setDpad("right", false)}
-              onPointerLeave={() => setDpad("right", false)}
-              className="w-11 h-11 rounded-xl bg-slate-900/85 active:bg-cyan-500 active:text-slate-950 border border-white/20 flex items-center justify-center shadow-lg"
-            >
-              <ArrowRight className="w-5 h-5" />
-            </button>
-          </div>
+          <button
+            type="button"
+            onPointerDown={() => setDpad("down", true)}
+            onPointerUp={() => setDpad("down", false)}
+            onPointerLeave={() => setDpad("down", false)}
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900/85 active:bg-cyan-400 active:text-slate-950 border border-white/20 flex items-center justify-center shadow-lg"
+          >
+            <ArrowDown className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            onPointerDown={() => setDpad("right", true)}
+            onPointerUp={() => setDpad("right", false)}
+            onPointerLeave={() => setDpad("right", false)}
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900/85 active:bg-cyan-400 active:text-slate-950 border border-white/20 flex items-center justify-center shadow-lg"
+          >
+            <ArrowRight className="w-5 h-5" />
+          </button>
         </div>
-      )}
+      </div>
     </>
   );
 }

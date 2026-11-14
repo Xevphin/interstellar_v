@@ -1,6 +1,6 @@
 import React from "react";
 import { X, Volume2, VolumeX, Globe, Sparkles, RotateCcw } from "lucide-react";
-import CapAvatar from "./CapAvatar";
+import DrFarahAvatar from "./DrFarahAvatar";
 
 export function SettingsModal({ t, lang, onChangeLang, soundOn, onToggleSound, onClose }) {
   return (
@@ -97,7 +97,7 @@ export function LoseModal({ t, depletedResource, onRetry }) {
         </h2>
 
         <div className="mb-6">
-          <CapAvatar mood="alert" message={tip} />
+          <DrFarahAvatar mood="alert" message={tip} />
         </div>
 
         <button

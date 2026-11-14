@@ -1,13 +1,14 @@
 export const TRANSLATIONS = {
   en: {
-    gameTitle: "Jezero 6: Mission Mars",
-    heroTagline: "6-Sol Outpost Survival Adventure",
-    choosePlanet: "Choose Your Landing Site",
-    marsTitle: "Mars: Jezero Crater",
-    marsSubtitle: "6-Sol Outpost Survival Demo",
-    marsCTA: "Launch Mission",
-    moonTitle: "Moon: Shackleton Crater",
-    moonSubtitle: "Coming Soon",
+    gameTitle: "Interstellar V: Lunar & Mars Outpost",
+    heroTagline: "6-Day Outpost Resource & Rover Survival",
+    choosePlanet: "Select Your 6-Day Outpost Mission",
+    lunarTitle: "Moon: Shackleton Lunar Outpost",
+    lunarSubtitle: "6-Day Lunar Outpost Survival Mission",
+    lunarCTA: "Launch Lunar Outpost",
+    marsTitle: "Mars: Jezero Crater Outpost",
+    marsSubtitle: "6-Day Mars Crater Survival Variant",
+    marsCTA: "Launch Mars Outpost",
     settings: "Settings",
     language: "Language",
     soundLabel: "Space Audio & Effects",
@@ -15,173 +16,286 @@ export const TRANSLATIONS = {
     soundOff: "Off",
     close: "Close",
     nasaDataBtn: "NASA Science & Data",
-    solLabel: "Sol",
+    solLabel: "Day",
     ofSix: "of 6",
+    tasksLabel: "Tasks",
     resources: {
       power: "Power",
       oxygen: "Oxygen",
       shielding: "Shielding",
       food: "Food",
     },
-    roverMode: "Rover Mode",
-    roverHint: "WASD / Arrows or D-Pad to drive • Drag to look",
+    roverMode: "Chase Cam",
+    freeCamMode: "Orbit Cam",
+    roverHint: "WASD / Arrows to drive • Press [E] near structures • Drag mouse to look",
     resetCam: "Reset View",
-    clickModuleHint: "Tip: Click any base module to inspect it!",
+    nextTaskBtn: "Locate Next Task",
+    finishMissionBtn: "Start Debrief Quiz",
+    interactPrompt: "Press [E] to Interact",
+    actionMenu: {
+      title: "Outpost Structure Controls",
+      subtitle: "Choose an action for this outpost module:",
+      taskBtn: "Task",
+      taskDesc: "Manage resources & make a key Day decision (30s timer)",
+      taskDoneBadge: "Completed",
+      factBtn: "Fact",
+      factDesc: "Read Dr. Farah's space science fact about this structure",
+      exitBtn: "Exit",
+      exitDesc: "Return to driving your rover",
+    },
     modules: {
-      habitat: "Habitat Dome & Shield",
-      solar: "Solar Array Field",
-      moxie: "MOXIE Air-Maker",
-      greenhouse: "Hydroponic Greenhouse",
+      moxie: "Oxygen Extractor (MOXIE / Regolith O₂)",
+      greenhouse: "Hydroponic Greenhouse Dome",
+      comms: "DONKI Space Weather & Shield Array",
+      solar: "Crater Peak Solar Array",
+      algae: "OSDR Bio-Algae Oxygen Lab",
+      habitat: "Central Habitat & MEDA Thermal Core",
     },
     intro: {
-      title: "Welcome to Jezero Crater, Cadet!",
-      capLine:
-        "Beep-boop! I'm Cap, your rover buddy! Jezero Crater is an ancient dry lakebed on Mars. One Martian day is called a Sol—let's keep our base alive for 6 Sols!",
-      startBtn: "Start Sol 1",
+      badge: "Mission Scientist Briefing",
+      title: "Welcome aboard, Commander! I’m Dr. Farah.",
+      coreQuote:
+        "Today we’re going to learn how to manage Lunar Outpost in 6 days with the resources that we need to balance for. Here is the big secret of space: every choice helps one thing and costs another. There is no free choice!",
+      howToPlayTitle: "How to Complete Your 6-Day Mission:",
+      steps: [
+        "Drive your rover using WASD / Arrow Keys (or the on-screen D-Pad) to all 6 Outpost Structures.",
+        "When you get close to a structure, press [E] to open the Action Menu: Task, Fact, or Exit.",
+        "Each Task gives you 30 seconds to weigh the trade-offs. Click my AI Helper button anytime for a hint!",
+        "Complete all 6 structure Tasks to unlock the Super Rover Upgrade and the final Debrief Quiz!",
+      ],
+      startBtn: "Begin Day 1 Exploration",
+    },
+    aiHelper: {
+      buttonLabel: "Ask Dr. Farah AI",
+      title: "Dr. Farah AI Mission Advisor",
+      defaultGreeting:
+        "Unsure which option to pick? Remember: there is no free choice! Tap a prompt below and I'll help you analyze the trade-offs.",
+      askHintBtn: "Ask for a Hint",
+      explainTradeoffBtn: "Explain Trade-offs",
+      checkLowestBtn: "Check My Lowest Stat",
+      lowestStatAdvice: (statName, val) =>
+        `Watch out! Your lowest resource right now is ${statName} (${val}%). Avoid choices that drain ${statName} too close to 0%!`,
+    },
+    timer: {
+      label: "Decision Timer",
+      timeoutNotice:
+        "Time's up! Emergency auto-protocol activated (-10% Power & Oxygen). Keep an eye on the 30s clock!",
+    },
+    upgrade: {
+      bannerTitle: "All 6 Tasks Complete — Hyper-Rover Upgrade Unlocked!",
+      drFarahMsg:
+        "Outstanding work, Commander! We've fitted your rover with golden plasma thrusters, a deep-space radar dish, and neon rim boosters. Enjoy your boosted top speed, or click 'Start Debrief Quiz' whenever you're ready!",
+      dismissBtn: "Test Upgraded Rover",
+      quizNowBtn: "Start Debrief Quiz Now",
     },
     sols: {
       1: {
-        title: "Sol 1: The MOXIE Air-Maker",
+        title: "Day 1 Task: Oxygen Extractor Unit",
         context:
-          "Mars air is 95% carbon dioxide! NASA's MOXIE machine turns it into breathable oxygen, but uses lots of battery power.",
-        capTip: "Running MOXIE makes fresh air, but watch our yellow Power bar!",
-        choiceA: "Run MOXIE Full Blast",
+          "Space has no breathable air! Our extractor pulls oxygen from lunar regolith and CO₂ (like NASA's MOXIE), but requires heavy battery power.",
+        drFarahTip:
+          "Fresh air keeps the crew sharp, but check how much yellow Power it costs!",
+        hint:
+          "Think about what our crew needs first: if Oxygen drops too low, astronauts can't work outside, but running full power drains our batteries early.",
+        tradeoff:
+          "Option A boosts Oxygen strongly (+▲) at the cost of Power (-▼). Option B saves Power (+▲) by using backup air tanks (-▼ Oxygen).",
+        factTitle: "Science Fact: Making Air from Moon & Mars Dust!",
+        factBody:
+          "Lunar soil (regolith) is over 40% oxygen locked inside rock minerals! Meanwhile on Mars, NASA's MOXIE instrument splits carbon dioxide gas into breathable oxygen. Both need lots of electrical heat!",
+        choiceA: "Run Oxygen Extractor Full Blast",
         choiceB: "Save Power & Use Backup Air",
       },
       2: {
-        title: "Sol 2: Cleaning Martian Soil (Perchlorates)",
+        title: "Day 2 Task: Hydroponic Greenhouse Dome",
         context:
-          "Martian dirt has natural salts called perchlorates that hurt plants unless we wash the soil and heat the greenhouse.",
-        capTip:
-          "Space potatoes need clean soil! Heating the greenhouse uses extra Shield energy.",
+          "Space soil has harsh minerals (and perchlorate salts on Mars) that hurt crops unless we filter the water and heat the greenhouse.",
+        drFarahTip:
+          "Space potatoes give us vital Food, though diverting power from the dome reduces Shielding!",
+        hint:
+          "Look at your Green (Food) and Indigo (Shielding) gauges. Tomorrow brings a space weather storm—will your shields be ready?",
+        tradeoff:
+          "Option A boosts Food (+▲) by diverting power from Shielding (-▼). Option B strengthens Shielding (+▲) while rationing snacks (-▼ Food).",
+        factTitle: "Science Fact: Space Farming & Hydroponics",
+        factBody:
+          "In NASA's Lunar & Mars greenhouses, plants grow under LED lamps using mineral-filtered water instead of raw dirt so astronauts get fresh vitamins and crisp greens!",
         choiceA: "Wash Soil & Heat Greenhouse",
         choiceB: "Keep Shields Max & Ration Snacks",
       },
       3: {
-        title: "Sol 3: NASA DONKI Solar Storm + 14-Min Delay",
+        title: "Day 3 Task: NASA DONKI Solar Storm Alert",
         context:
-          "NASA's DONKI space weather tracker spots a solar storm! Radio messages from Earth take 14 minutes to reach Mars—you must decide fast!",
-        capTip:
-          "Whoa, solar storm alert! Earth can't reply in time—trust your Cadet instincts!",
+          "NASA's DONKI space weather tracker spots a solar storm incoming! Deep-space comms have a delay—you must decide how to protect the outpost right now!",
+        drFarahTip:
+          "Solar storms slam into weak shields! Check if your Shielding gauge can survive a big drop.",
+        hint:
+          "A solar storm hits Shielding the hardest. If your Shielding is under 50%, leaving shields unboosted is very risky!",
+        tradeoff:
+          "Option A raises Storm Shields (+▲) using Power (-▼) and Oxygen (-▼). Option B saves air (+▲ Oxygen) but takes a heavy hit to Shielding (-▼).",
+        factTitle: "Science Fact: NASA DONKI Space Weather",
+        factBody:
+          "DONKI (Database Of Notifications, Knowledge, Information) tracks solar flares from the Sun so astronauts on the Moon and Mars can activate radiation shields in time!",
         choiceA: "Boost Storm Shields Now",
         choiceB: "Keep Air Scrubbers Full Speed",
       },
       4: {
-        title: "Sol 4: Red Dust Devil on Solar Panels",
+        title: "Day 4 Task: Electrostatic Dust on Solar Panels",
         context:
-          "A Martian dust devil covered our solar panels in red dust, slowing down battery charging.",
-        capTip:
-          "Brushing the panels outside takes oxygen and snack energy, but charges our base!",
+          "Abrasive crater dust coated our solar array, cutting battery charging! Sending a crew outside to brush them off uses suit air and food energy.",
+        drFarahTip:
+          "Clean solar panels give a huge Power surge for the final two days!",
+        hint:
+          "Days 5 and 6 will need plenty of Power for labs and night heaters. Can your Oxygen and Food handle an outdoor cleaning walk?",
+        tradeoff:
+          "Option A cleans the panels for a big Power boost (+▲) at the cost of Oxygen (-▼) and Food (-▼). Option B stays inside (+▲ Food) but loses Power (-▼).",
+        factTitle: "Science Fact: Clingy Crater Dust",
+        factBody:
+          "Lunar and Martian dust gets electrostatically charged by sunlight and sticks to solar panels and spacesuits like static-cling glitter!",
         choiceA: "Brush Off Solar Panels",
         choiceB: "Stay Inside on Low Power",
       },
       5: {
-        title: "Sol 5: NASA OSDR Green Algae Test",
+        title: "Day 5 Task: NASA OSDR Bio-Algae Lab",
         context:
-          "Mission Control asks us to test growing green algae from NASA's OSDR space-biology lab to make extra oxygen in Mars gravity.",
-        capTip:
-          "Science time! Green algae can give us a big oxygen boost before the final night.",
+          "Mission Control asks us to run a green algae bioreactor from NASA's OSDR space-biology lab to generate extra oxygen in low gravity.",
+        drFarahTip:
+          "Micro-algae are tiny oxygen factories! Check if we have enough Power and Food nutrients to run the lab.",
+        hint:
+          "If your Oxygen gauge is getting low, the algae bioreactor is a lifesaver. If Power or Food is critically low, saving supplies may be safer.",
+        tradeoff:
+          "Option A gives a big Oxygen boost (+▲) using Power (-▼) and Food (-▼). Option B saves Power (+▲) and Food (+▲) at a small Oxygen cost (-▼).",
+        factTitle: "Science Fact: NASA OSDR Space Biology",
+        factBody:
+          "NASA's Open Science Data Repository (OSDR) studies how algae, plants, and microbes grow in microgravity—helping future habitats recycle air naturally!",
         choiceA: "Run NASA Algae Test",
         choiceB: "Skip Test & Save Supplies",
       },
       6: {
-        title: "Sol 6: Freezing -85°C Martian Night",
+        title: "Day 6 Task: Freezing Crater Night (-85°C to -130°C)",
         context:
-          "NASA's MEDA weather station reads -85°C outside! Survive until the relief rocket lands at sunrise!",
-        capTip:
-          "Final Sol, Cadet! Keep the heaters steady until the sunrise rescue rocket arrives!",
+          "Sensors read freezing night temperatures outside the crater! Balance the thermal heaters until the relief lander touches down at sunrise!",
+        drFarahTip:
+          "Final day, Commander! Pick the option that keeps all four gauges above 0%!",
+        hint:
+          "This is the final test! Look closely at your four resource bars—pick the choice that won't push your lowest bar to 0%.",
+        tradeoff:
+          "Option A spreads the load evenly across Power (-▼), Oxygen (-▼), and Shielding (-▼). Option B drains more Power (-▼) and Food (-▼) while sparing Oxygen and Shields.",
+        factTitle: "Science Fact: Extreme Crater Nights",
+        factBody:
+          "Without a thick blanket of air like Earth's atmosphere, crater temperatures plunge below -85°C on Mars and -130°C on the Moon as soon as the Sun sets!",
         choiceA: "Balance Heaters, Air & Shields",
         choiceB: "Blast Full Heaters Early",
       },
     },
     lose: {
-      title: "Mission Paused — Outpost Needs Help!",
-      retryBtn: "Try Again from Sol 1",
+      title: "Mission Paused — Outpost Resource Depleted!",
+      retryBtn: "Try Again from Day 1",
       tips: {
         power:
-          "Our Power hit 0%! On Mars, solar panels and heaters share the same batteries. Try balancing power-hungry machines like MOXIE!",
+          "Our Power hit 0%! Remember my big secret of space: every choice helps one thing and costs another. Next run, clean the solar panels on Day 4 or conserve battery power!",
         oxygen:
-          "Our Oxygen hit 0%! Mars air is mostly carbon dioxide, so astronauts rely on machines like MOXIE and algae experiments to breathe.",
+          "Our Oxygen hit 0%! Crew members need steady breathable air from the extractor and algae lab. Watch the cyan Oxygen gauge closely!",
         shielding:
-          "Our Shielding hit 0%! Radiation and solar storms on Mars are fierce—keeping strong shields protects the whole crew!",
+          "Our Shielding hit 0%! Solar storms and cosmic radiation require strong shields. Boost shields during the DONKI storm alert!",
         food:
-          "Our Food hit 0%! Growing space crops in clean, washed soil keeps astronauts energized for hard work outside.",
+          "Our Food hit 0%! Astronauts burn lots of calories working outside. Keep the greenhouse growing so the crew stays fed!",
       },
     },
-    victory: {
-      bannerTitle: "Sunrise Rescue! You Survived All 6 Sols!",
-      capLine:
-        "Woohoo! The relief rocket landed! Ready for your 4-question Cadet Debrief Quiz to earn your Mars Certificate?",
-      goToQuiz: "Start Debrief Quiz",
-    },
     quiz: {
-      title: "Cadet Debrief Quiz",
-      subtitle: "Answer 4 quick questions to unlock your official Mars Certificate!",
+      title: "Post-Mission Commander Debrief Quiz",
+      subtitle:
+        "Answer 4 rapid-fire questions (30s each) to calculate your final Commander Score!",
       questionLabel: "Question",
       nextBtn: "Next Question",
-      finishBtn: "Claim Cadet Certificate",
+      finishBtn: "View Mission Leaderboard",
+      timeoutFeedback: "Time expired! Moving to the next debrief question.",
       questions: [
         {
-          q: "Why did we have to make tough choices between Power, Oxygen, Shields, and Food?",
+          q: "Why must space outpost commanders carefully balance Power, Oxygen, Shielding, and Food?",
           options: [
-            "Mars bases have limited energy, so boosting one system uses up another!",
-            "Robots on Mars like to turn lights off for fun.",
-            "Mars has unlimited free electricity in the air.",
+            "Every choice helps one system and costs another—there is no free choice",
+            "Outpost computers randomly turn machines off for fun",
+            "Space bases have unlimited free battery power",
+            "Astronauts only need one resource to survive",
           ],
           correct: 0,
           feedbackCorrect:
-            "Spot on! Every Mars outpost has a strict energy budget—smart trade-offs keep everyone safe!",
+            "Spot on! As Dr. Farah says, every choice helps one thing and costs another!",
           feedbackWrong:
-            "Not quite! On Mars, energy is limited—using more power for one system means less for another.",
+            "Remember Dr. Farah's rule: in space, energy is limited—every choice helps one system and costs another!",
         },
         {
-          q: "What does NASA's real MOXIE machine make from Mars's carbon dioxide (CO₂) air?",
+          q: "How do NASA systems like MOXIE and regolith extractors help astronauts breathe?",
           options: [
-            "Liquid rocket fuel",
-            "Breathable Oxygen",
-            "Space ice cream",
+            "They teleport fresh air directly from Earth",
+            "They extract breathable oxygen from local CO₂ gas or lunar soil using electrical power",
+            "They freeze starlight into liquid air",
+            "They grow oxygen without using any electricity",
           ],
           correct: 1,
           feedbackCorrect:
-            "Awesome! MOXIE on NASA's Perseverance rover really turns Martian CO₂ into breathable oxygen!",
+            "Correct! Making oxygen on the Moon or Mars uses local resources and lots of electrical power!",
           feedbackWrong:
-            "Good guess, but MOXIE actually turns Mars's carbon dioxide air into breathable oxygen!",
+            "Not quite! Extractors pull breathable oxygen from local CO₂ or lunar soil using electrical power.",
         },
         {
-          q: "Why couldn't Earth Mission Control make the Sol 3 Solar Storm choice for us?",
+          q: "What does NASA's DONKI space weather system warn astronauts about?",
           options: [
-            "They were asleep on Earth.",
-            "Radio signals take about 14 minutes to travel between Earth and Mars!",
-            "Mars blocks all radio waves forever.",
-          ],
-          correct: 1,
-          feedbackCorrect:
-            "You got it! Because Mars is so far away, radio messages take ~14 minutes each way!",
-          feedbackWrong:
-            "Close! Mars is millions of kilometers away, so radio messages take about 14 minutes to arrive!",
-        },
-        {
-          q: "Why do astronauts need to wash Martian soil before growing space potatoes?",
-          options: [
-            "To remove natural salts called perchlorates that hurt plants",
-            "To make the dirt look prettier",
-            "Because Martian dirt is too wet",
+            "Incoming solar storms so the crew can boost radiation shielding in time",
+            "When space potatoes are ready to harvest",
+            "How fast the rover wheels are spinning",
+            "Rainstorms and ocean tides on Earth",
           ],
           correct: 0,
           feedbackCorrect:
-            "Brilliant! Washing out perchlorate salts makes Martian soil safe for growing healthy crops!",
+            "Awesome! DONKI tracks solar storms so astronauts can protect the outpost with strong shields!",
           feedbackWrong:
-            "Almost! Martian soil has natural salts called perchlorates that we must wash out first.",
+            "DONKI tracks solar storms and flares from the Sun so crews can boost radiation shielding!",
+        },
+        {
+          q: "Why did brushing crater dust off the solar panels cost Oxygen and Food?",
+          options: [
+            "Solar panels eat snacks to make electricity",
+            "Working outside in a spacesuit uses breathable air and astronaut energy, but restores Power",
+            "Dust turns into food when brushed off",
+            "Brushing solar panels permanently turns off the sun",
+          ],
+          correct: 1,
+          feedbackCorrect:
+            "Brilliant! Spacewalks use suit oxygen and food calories in exchange for recharging outpost batteries!",
+          feedbackWrong:
+            "Working outside in a spacesuit costs oxygen and food energy, trading them for a big Power boost!",
         },
       ],
     },
+    leaderboard: {
+      title: "Lunar Outpost Commander Leaderboard",
+      subtitle: "Compare your 6-Day Outpost performance against top Commanders!",
+      totalScoreLabel: "Total Mission Score",
+      breakdown: {
+        resources: "Resource Balance",
+        tasks: "Completed Tasks",
+        quiz: "Quiz Accuracy",
+        timeBonus: "Speed Bonus",
+      },
+      enterNameLabel: "Save Your Commander Callsign:",
+      namePlaceholder: "e.g., Cmdr. Zara",
+      saveBtn: "Save Score",
+      savedBadge: "Saved to Leaderboard!",
+      rankCol: "Rank",
+      nameCol: "Commander",
+      tasksCol: "Tasks",
+      quizCol: "Quiz",
+      scoreCol: "Score",
+      certificateBtn: "View & Download Certificate",
+      playAgainBtn: "Play Again",
+    },
     certificate: {
-      heading: "Official Mars Cadet Certificate",
+      heading: "Official Space Outpost Commander Certificate",
       presentedTo: "Proudly Awarded To",
-      namePlaceholder: "Enter Cadet Name...",
-      defaultName: "Space Cadet",
+      namePlaceholder: "Enter Commander Name...",
+      defaultName: "Space Commander",
       completedLine:
-        "For successfully surviving 6 Sols at Jezero Crater, Mars!",
+        "For mastering resource trade-offs across 6 Days at the Lunar & Mars Outpost!",
       finalStats: "Final Outpost Status",
       badgeLabel: "Specialty Rank",
       badges: {
@@ -192,38 +306,40 @@ export const TRANSLATIONS = {
       },
       printBtn: "Print / Save PDF",
       downloadBtn: "Download PNG",
+      backToLeaderboard: "Back to Leaderboard",
       playAgainBtn: "Play Again",
     },
     nasaModal: {
       title: "NASA Science & Data",
       intro:
-        "Jezero 6: Mission Mars is inspired by real NASA Mars missions and open science datasets curated for young explorers:",
+        "This mission is inspired by real NASA space exploration systems and open science datasets curated for students:",
       items: [
         {
-          name: "NASA Perseverance Rover (MOXIE & MEDA)",
-          desc: "MOXIE demonstrated making oxygen from Martian CO₂, while MEDA measures Mars weather, dust, and freezing temperatures.",
+          name: "NASA Artemis Lunar Outpost & Perseverance (MOXIE / MEDA)",
+          desc: "In-situ resource utilization (ISRU) extracts oxygen from lunar regolith and Martian CO₂ while thermal sensors track extreme crater nights.",
         },
         {
           name: "NASA DONKI Space Weather Database",
-          desc: "Tracks solar flares and space storms so astronauts know when to boost radiation shielding.",
+          desc: "Tracks solar flares and coronal mass ejections so crews can boost radiation shielding before storms hit.",
         },
         {
           name: "NASA Open Science Data Repository (OSDR)",
-          desc: "Shares real space-biology experiments—like growing algae and plants in space—with scientists and students worldwide.",
+          desc: "Shares space-biology experiments—like growing microalgae and hydroponic crops—with students worldwide.",
         },
       ],
     },
   },
 
   ms: {
-    gameTitle: "Jezero 6: Misi Marikh",
-    heroTagline: "Pengembaraan Hidup 6-Sol di Marikh",
-    choosePlanet: "Pilih Tapak Pendaratan Anda",
-    marsTitle: "Marikh: Kawah Jezero",
-    marsSubtitle: "Demo Hidup Pangkalan 6-Sol",
-    marsCTA: "Mulakan Misi",
-    moonTitle: "Bulan: Kawah Shackleton",
-    moonSubtitle: "Akan Datang",
+    gameTitle: "Interstellar V: Pangkalan Bulan & Marikh",
+    heroTagline: "Kembara 6-Hari Pengurusan Sumber & Rover",
+    choosePlanet: "Pilih Misi Pangkalan 6-Hari Anda",
+    lunarTitle: "Bulan: Pangkalan Kawah Shackleton",
+    lunarSubtitle: "Misi Hidup Pangkalan Bulan 6-Hari",
+    lunarCTA: "Mulakan Misi Bulan",
+    marsTitle: "Marikh: Pangkalan Kawah Jezero",
+    marsSubtitle: "Variasi Misi Kawah Marikh 6-Hari",
+    marsCTA: "Mulakan Misi Marikh",
     settings: "Tetapan",
     language: "Bahasa",
     soundLabel: "Audio Angkasa & Kesan Bunyi",
@@ -231,175 +347,286 @@ export const TRANSLATIONS = {
     soundOff: "Mati",
     close: "Tutup",
     nasaDataBtn: "Sains & Data NASA",
-    solLabel: "Sol",
+    solLabel: "Hari",
     ofSix: "drp 6",
+    tasksLabel: "Tugasan",
     resources: {
       power: "Tenaga",
       oxygen: "Oksigen",
       shielding: "Perisai",
       food: "Makanan",
     },
-    roverMode: "Mod Rover",
-    roverHint: "WASD / Anak panah atau D-Pad untuk pandu • Seret untuk lihat",
+    roverMode: "Kamera Rover",
+    freeCamMode: "Kamera Orbit",
+    roverHint: "WASD / Anak Panah untuk pandu • Tekan [E] dekat struktur • Seret tetikus",
     resetCam: "Set Semula Kamera",
-    clickModuleHint: "Tip: Klik mana-mana modul pangkalan untuk periksa!",
+    nextTaskBtn: "Cari Tugasan Seterusnya",
+    finishMissionBtn: "Mula Kuiz Debrief",
+    interactPrompt: "Tekan [E] untuk Interaksi",
+    actionMenu: {
+      title: "Kawalan Struktur Pangkalan",
+      subtitle: "Pilih tindakan untuk modul pangkalan ini:",
+      taskBtn: "Task (Tugasan)",
+      taskDesc: "Urus sumber & buat keputusan penting (masa 30s)",
+      taskDoneBadge: "Selesai",
+      factBtn: "Fact (Fakta)",
+      factDesc: "Baca fakta sains angkasa Dr. Farah tentang struktur ini",
+      exitBtn: "Exit (Keluar)",
+      exitDesc: "Kembali memandu rover anda",
+    },
     modules: {
-      habitat: "Kubah Habitat & Perisai",
-      solar: "Medan Panel Suria",
-      moxie: "Penjana Udara MOXIE",
-      greenhouse: "Rumah Hijau Hidroponik",
+      moxie: "Penjana Oksigen (MOXIE / Regolit O₂)",
+      greenhouse: "Kubah Rumah Hijau Hidroponik",
+      comms: "Stesen Cuaca Angkasa & Perisai DONKI",
+      solar: "Medan Panel Suria Kawah",
+      algae: "Makmal Bio-Alga Oksigen OSDR",
+      habitat: "Kubah Habitat Utama & Teras Haba MEDA",
     },
     intro: {
-      title: "Selamat Datang ke Kawah Jezero, Kadet!",
-      capLine:
-        "Bip-bop! Saya Cap, rakan rover anda! Kawah Jezero ialah tasik purba yang kering di Marikh. Satu hari di Marikh dipanggil Sol—mari kekalkan pangkalan kita selama 6 Sol!",
-      startBtn: "Mula Sol 1",
+      badge: "Taklimat Saintis Misi",
+      title: "Selamat datang, Komander! Saya Dr. Farah.",
+      coreQuote:
+        "Today we’re going to learn how to manage Lunar Outpost in 6 days with the resources that we need to balance for. Here is the big secret of space: every choice helps one thing and costs another. There is no free choice!",
+      howToPlayTitle: "Cara Menyelesaikan Misi 6-Hari Anda:",
+      steps: [
+        "Pandu rover anda guna kekunci WASD / Anak Panah (atau D-Pad skrin) ke semua 6 Struktur Pangkalan.",
+        "Apabila dekat dengan struktur, tekan [E] untuk buka Menu Tindakan: Task, Fact, atau Exit.",
+        "Setiap Task memberi masa 30 saat untuk membuat keputusan. Klik butang Pembantu AI saya untuk petunjuk!",
+        "Selesaikan semua 6 Task struktur untuk membuka Naik Taraf Super Rover dan Kuiz Akhir!",
+      ],
+      startBtn: "Mula Penerokaan Hari 1",
+    },
+    aiHelper: {
+      buttonLabel: "Tanya AI Dr. Farah",
+      title: "Penasihat Misi AI Dr. Farah",
+      defaultGreeting:
+        "Tidak pasti mahu pilih yang mana? Ingat: tiada pilihan percuma! Tekan butang di bawah untuk analisis timbal-balik.",
+      askHintBtn: "Minta Petunjuk (Hint)",
+      explainTradeoffBtn: "Terangkan Kesan Pilihan",
+      checkLowestBtn: "Semak Bar Terendah Saya",
+      lowestStatAdvice: (statName, val) =>
+        `Hati-hati! Sumber terendah anda sekarang ialah ${statName} (${val}%). Elakkan pilihan yang menurunkan ${statName} ke 0%!`,
+    },
+    timer: {
+      label: "Masa Keputusan",
+      timeoutNotice:
+        "Masa tamat! Protokol kecemasan automatik diaktifkan (-10% Tenaga & Oksigen). Perhatikan jam 30s!",
+    },
+    upgrade: {
+      bannerTitle: "Semua 6 Tugasan Selesai — Naik Taraf Hyper-Rover Dibuka!",
+      drFarahMsg:
+        "Syabas, Komander! Rover anda kini dilengkapi pendorong plasma emas, piring radar angkasa, dan rim bercahaya neon. Nikmati kelajuan baharu, atau klik 'Mula Kuiz Debrief' bila-bila masa!",
+      dismissBtn: "Pandu Uji Rover Baharu",
+      quizNowBtn: "Mula Kuiz Debrief Sekarang",
     },
     sols: {
       1: {
-        title: "Sol 1: Penjana Udara MOXIE",
+        title: "Tugasan Hari 1: Unit Penjana Oksigen",
         context:
-          "Udara Marikh mengandungi 95% karbon dioksida! Mesin MOXIE NASA menukarkannya kepada oksigen, tetapi guna banyak kuasa bateri.",
-        capTip:
-          "Menjalankan MOXIE menghasilkan udara segar, tapi perhatikan bar Tenaga kuning kita!",
-        choiceA: "Jalankan MOXIE Sepenuh Kuasa",
+          "Tiada udara bernafas di angkasa! Mesin kita mengekstrak oksigen daripada batuan bulan & CO₂ (seperti MOXIE NASA), tetapi memerlukan kuasa bateri tinggi.",
+        drFarahTip:
+          "Udara segar penting untuk kru, tetapi perhatikan kos Tenaga kuning kita!",
+        hint:
+          "Fikirkan keperluan kru: jika Oksigen terlalu rendah kru tidak boleh bekerja, tetapi kuasa penuh menggunakan bateri awal.",
+        tradeoff:
+          "Pilihan A meningkatkan Oksigen (+▲) dengan kos Tenaga (-▼). Pilihan B menjimatkan Tenaga (+▲) menggunakan tangki udara simpanan (-▼ Oksigen).",
+        factTitle: "Fakta Sains: Menjana Udara daripada Debu Bulan & Marikh!",
+        factBody:
+          "Tanah bulan (regolit) mengandungi lebih 40% oksigen yang terikat dalam mineral batuan! Di Marikh pula, mesin MOXIE NASA memisahkan gas CO₂ kepada oksigen.",
+        choiceA: "Jalankan Penjana Oksigen Penuh",
         choiceB: "Jimat Tenaga & Guna Udara Simpanan",
       },
       2: {
-        title: "Sol 2: Cuci Tanah Marikh (Perklorat)",
+        title: "Tugasan Hari 2: Kubah Rumah Hijau Hidroponik",
         context:
-          "Tanah Marikh ada garam semula jadi bernama perklorat yang merosakkan tumbuhan kecuali kita mencucinya dan memanaskan rumah hijau.",
-        capTip:
-          "Kentang angkasa perlukan tanah bersih! Pemanas rumah hijau guna tenaga Perisai.",
+          "Tanah angkasa perlu ditapis dan rumah hijau perlu dipanaskan supaya tanaman kentang angkasa tumbuh subur.",
+        drFarahTip:
+          "Kentang angkasa memberi Makanan penting, tetapi meminjam kuasa daripada kubah mengurangkan Perisai!",
+        hint:
+          "Perhatikan bar Makanan (Hijau) dan Perisai (Biru/Ungu). Esok ada amaran ribut suria—adakah perisai anda cukup kuat?",
+        tradeoff:
+          "Pilihan A menambah Makanan (+▲) tetapi mengurangkan Perisai (-▼). Pilihan B menguatkan Perisai (+▲) sambil mencatu snek (-▼ Makanan).",
+        factTitle: "Fakta Sains: Pertanian Angkasa & Hidroponik",
+        factBody:
+          "Dalam rumah hijau angkasa NASA, tumbuhan ditanam di bawah lampu LED dengan air berzat supaya angkasawan mendapat makanan segar!",
         choiceA: "Cuci Tanah & Panaskan Rumah Hijau",
         choiceB: "Kekalkan Perisai & Catuan Snek",
       },
       3: {
-        title: "Sol 3: Ribut Suria DONKI NASA + Kelewatan 14 Minit",
+        title: "Tugasan Hari 3: Amaran Ribut Suria DONKI NASA",
         context:
-          "Penjejak cuaca angkasa DONKI NASA mengesan ribut suria! Mesej radio dari Bumi ambil masa 14 minit ke Marikh—anda mesti pilih cepat!",
-        capTip:
-          "Awas, amaran ribut suria! Bumi tak sempat balas—ikut gerak hati Kadet anda!",
+          "Sistem cuaca angkasa DONKI NASA mengesan ribut suria! Anda perlu membuat keputusan pantas untuk melindungi pangkalan sekarang!",
+        drFarahTip:
+          "Ribut suria menyerang perisai yang lemah! Pastikan bar Perisai anda tidak jatuh ke 0%.",
+        hint:
+          "Ribut suria memberi kesan paling besar kepada Perisai. Jika Perisai anda rendah, tingkatkan perisai segera!",
+        tradeoff:
+          "Pilihan A meningkatkan Perisai Ribut (+▲) menggunakan Tenaga (-▼) dan Oksigen (-▼). Pilihan B menambah Oksigen (+▲) tetapi menurunkan Perisai (-▼).",
+        factTitle: "Fakta Sains: Cuaca Angkasa DONKI NASA",
+        factBody:
+          "DONKI menjejak suar suria dari Matahari supaya angkasawan di Bulan dan Marikh dapat mengaktifkan perisai radiasi tepat pada masanya!",
         choiceA: "Tingkatkan Perisai Ribut Sekarang",
         choiceB: "Kekalkan Penapis Udara Laju Penuh",
       },
       4: {
-        title: "Sol 4: Puting Beliung Debu di Panel Suria",
+        title: "Tugasan Hari 4: Debu Elektrostatik di Panel Suria",
         context:
-          "Puting beliung debu Marikh menyaluti panel suria kita dengan debu merah, melambatkan pengecasan bateri.",
-        capTip:
-          "Membersih panel di luar guna oksigen dan tenaga makanan, tapi cas semula pangkalan kita!",
+          "Debu kawah menyaluti panel suria kita dan melambatkan pengecasan bateri! Membersihkannya di luar menggunakan oksigen sut dan tenaga makanan.",
+        drFarahTip:
+          "Panel suria yang bersih memberikan lonjakan Tenaga besar untuk dua hari terakhir!",
+        hint:
+          "Hari 5 dan 6 memerlukan banyak Tenaga untuk makmal dan pemanas malam. Adakah Oksigen dan Makanan anda mencukupi untuk kerja luar?",
+        tradeoff:
+          "Pilihan A membersihkan panel untuk Tenaga tinggi (+▲) dengan kos Oksigen (-▼) dan Makanan (-▼). Pilihan B kekal di dalam (+▲ Makanan) tetapi hilang Tenaga (-▼).",
+        factTitle: "Fakta Sains: Debu Kawah Berlekatan",
+        factBody:
+          "Debu Bulan dan Marikh bercas elektrostatik akibat cahaya matahari dan melekat kuat pada panel suria serta sut angkasa!",
         choiceA: "Bersihkan Debu Panel Suria",
-        choiceB: "Duduk di Dalam Dengan Kuasa Rendah",
+        choiceB: "Kekal di Dalam Dengan Kuasa Rendah",
       },
       5: {
-        title: "Sol 5: Ujian Alga Hijau OSDR NASA",
+        title: "Tugasan Hari 5: Makmal Bio-Alga OSDR NASA",
         context:
-          "Pusat Kawalan meminta kita menguji penanaman alga hijau dari makmal bio-angkasa OSDR NASA untuk hasilkan oksigen tambahan.",
-        capTip:
-          "Masa sains! Alga hijau boleh beri lonjakan oksigen sebelum malam terakhir.",
+          "Pusat Kawalan meminta kita menjalankan bioreaktor alga hijau dari makmal OSDR NASA untuk menghasilkan oksigen tambahan dalam graviti rendah.",
+        drFarahTip:
+          "Mikro-alga ialah kilang oksigen semula jadi! Semak sama ada Tenaga dan Makanan mencukupi.",
+        hint:
+          "Jika bar Oksigen anda rendah, ujian alga ini sangat membantu. Jika Tenaga atau Makanan terlalu rendah, berjimat lebih selamat.",
+        tradeoff:
+          "Pilihan A memberi lonjakan Oksigen (+▲) menggunakan Tenaga (-▼) dan Makanan (-▼). Pilihan B menjimatkan Tenaga (+▲) dan Makanan (+▲) dengan kos Oksigen (-▼).",
+        factTitle: "Fakta Sains: Biologi Angkasa OSDR NASA",
+        factBody:
+          "Repositori Data Sains Terbuka NASA (OSDR) mengkaji pertumbuhan alga dan tumbuhan di angkasa untuk mengitar semula udara secara semula jadi!",
         choiceA: "Jalankan Ujian Alga NASA",
         choiceB: "Langkau Ujian & Simpan Bekalan",
       },
       6: {
-        title: "Sol 6: Malam Marikh Sejuk Beku -85°C",
+        title: "Tugasan Hari 6: Malam Kawah Sejuk Beku (-85°C hingga -130°C)",
         context:
-          "Stesen cuaca MEDA NASA mencatat -85°C di luar! Bertahan sehingga roket penyelamat mendarat waktu matahari terbit!",
-        capTip:
-          "Sol terakhir, Kadet! Imbangkan pemanas sehingga roket penyelamat tiba!",
+          "Sensor mencatat suhu malam sejuk melampau di luar kawah! Imbangkan pemanas haba sehingga roket penyelamat mendarat waktu subuh!",
+        drFarahTip:
+          "Hari terakhir, Komander! Pilih tindakan yang memastikan keempat-empat bar kekal di atas 0%!",
+        hint:
+          "Ini ujian terakhir! Perhatikan keempat-empat bar sumber anda—pilih pilihan yang tidak menolak bar terendah anda ke 0%.",
+        tradeoff:
+          "Pilihan A mengagihkan beban secara seimbang pada Tenaga (-▼), Oksigen (-▼), dan Perisai (-▼). Pilihan B menggunakan lebih Tenaga (-▼) dan Makanan (-▼).",
+        factTitle: "Fakta Sains: Suhu Malam Kawah Ekstrem",
+        factBody:
+          "Tanpa atmosfera tebal seperti Bumi, suhu kawah menjunam di bawah -85°C di Marikh dan -130°C di Bulan sebaik sahaja matahari terbenam!",
         choiceA: "Imbangkan Pemanas, Udara & Perisai",
         choiceB: "Pasang Pemanas Penuh Awal",
       },
     },
     lose: {
-      title: "Misi Dijeda — Pangkalan Perlukan Bantuan!",
-      retryBtn: "Cuba Lagi dari Sol 1",
+      title: "Misi Dijeda — Sumber Pangkalan Kehabisan!",
+      retryBtn: "Cuba Lagi dari Hari 1",
       tips: {
         power:
-          "Tenaga kita mencecah 0%! Di Marikh, panel suria dan pemanas berkongsi bateri yang sama. Cuba imbangkan mesin kuat tenaga seperti MOXIE!",
+          "Tenaga kita mencecah 0%! Ingat rahsia angkasa saya: setiap pilihan membantu satu perkara dan mengorbankan yang lain. Cuba bersihkan panel suria pada Hari 4!",
         oxygen:
-          "Oksigen kita mencecah 0%! Udara Marikh kebanyakannya karbon dioksida, jadi angkasawan bergantung pada mesin seperti MOXIE dan alga untuk bernafas.",
+          "Oksigen kita mencecah 0%! Kru memerlukan udara segar daripada penjana oksigen dan makmal alga.",
         shielding:
-          "Perisai kita mencecah 0%! Radiasi dan ribut suria di Marikh sangat kuat—perisai kukuh melindungi seluruh kru!",
+          "Perisai kita mencecah 0%! Ribut suria memerlukan perisai kukuh. Pastikan perisai ditingkatkan semasa amaran DONKI!",
         food:
-          "Makanan kita mencecah 0%! Menanam tanaman angkasa dalam tanah bersih memberi tenaga kepada angkasawan untuk kerja luar.",
+          "Makanan kita mencecah 0%! Pastikan rumah hijau hidroponik dijaga supaya kru kekal bertenaga!",
       },
     },
-    victory: {
-      bannerTitle: "Penyelamat Subuh! Anda Berjaya Harungi 6 Sol!",
-      capLine:
-        "Hore! Roket penyelamat telah mendarat! Bersedia untuk Kuiz Kadet 4 soalan bagi mendapatkan Sijil Marikh anda?",
-      goToQuiz: "Mula Kuiz Kadet",
-    },
     quiz: {
-      title: "Kuiz Tamat Misi Kadet",
+      title: "Kuiz Debrief Komander Pasca-Misi",
       subtitle:
-        "Jawab 4 soalan ringkas untuk membuka Sijil Rasmi Marikh anda!",
+        "Jawab 4 soalan pantas (30s setiap satu) untuk mengira Skor Akhir Komander anda!",
       questionLabel: "Soalan",
       nextBtn: "Soalan Seterusnya",
-      finishBtn: "Tuntut Sijil Kadet",
+      finishBtn: "Lihat Papan Pendahulu Misi",
+      timeoutFeedback: "Masa tamat! Beralih ke soalan debrief seterusnya.",
       questions: [
         {
-          q: "Mengapa kita perlu membuat pilihan sukar antara Tenaga, Oksigen, Perisai, dan Makanan?",
+          q: "Mengapa komander pangkalan angkasa mesti mengimbangi Tenaga, Oksigen, Perisai, dan Makanan?",
           options: [
-            "Pangkalan Marikh ada tenaga terhad, jadi menguatkan satu sistem guna sumber lain!",
-            "Robot di Marikh suka tutup lampu untuk berseronok.",
-            "Marikh ada elektrik percuma tanpa had di udara.",
+            "Setiap pilihan membantu satu sistem dan mengorbankan yang lain—tiada pilihan percuma",
+            "Komputer pangkalan suka menutup mesin secara rawak",
+            "Pangkalan angkasa mempunyai bateri percuma tanpa had",
+            "Angkasawan hanya perlukan satu sumber sahaja untuk hidup",
           ],
           correct: 0,
           feedbackCorrect:
-            "Tepat sekali! Setiap pangkalan Marikh ada bajet tenaga terhad—pilihan bijak menjaga keselamatan semua!",
+            "Tepat sekali! Seperti kata Dr. Farah, setiap pilihan membantu satu perkara dan mengorbankan yang lain!",
           feedbackWrong:
-            "Hampir tepat! Di Marikh, tenaga terhad—guna lebih kuasa untuk satu sistem bermakna kurang untuk sistem lain.",
+            "Ingat pesanan Dr. Farah: di angkasa, setiap pilihan membantu satu sistem dan mengorbankan yang lain!",
         },
         {
-          q: "Apakah yang dihasilkan oleh mesin MOXIE sebenar NASA daripada udara karbon dioksida (CO₂) Marikh?",
+          q: "Bagaimanakah sistem NASA seperti MOXIE dan pengekstrak regolit membantu angkasawan bernafas?",
           options: [
-            "Bahan api roket cecair",
-            "Oksigen untuk bernafas",
-            "Aiskrim angkasa",
+            "Menghantar udara segar terus dari Bumi",
+            "Mengekstrak oksigen daripada gas CO₂ atau batuan bulan menggunakan kuasa elektrik",
+            "Membekukan cahaya bintang menjadi udara cecair",
+            "Menghasilkan oksigen tanpa sebarang tenaga elektrik",
           ],
           correct: 1,
           feedbackCorrect:
-            "Hebat! MOXIE pada rover Perseverance NASA benar-benar menukar CO₂ Marikh kepada oksigen!",
+            "Betul! Menghasilkan oksigen di Bulan atau Marikh menggunakan sumber tempatan dan tenaga elektrik!",
           feedbackWrong:
-            "Cuba lagi! MOXIE sebenarnya menukar udara karbon dioksida Marikh kepada oksigen untuk bernafas.",
+            "Pengekstrak menghasilkan oksigen daripada CO₂ atau tanah bulan menggunakan kuasa elektrik.",
         },
         {
-          q: "Mengapa Pusat Kawalan Bumi tidak dapat membuat keputusan Ribut Suria Sol 3 untuk kita?",
+          q: "Apakah amaran yang diberikan oleh sistem cuaca angkasa DONKI NASA kepada angkasawan?",
           options: [
-            "Mereka sedang tidur di Bumi.",
-            "Isyarat radio ambil masa kira-kira 14 minit antara Bumi dan Marikh!",
-            "Marikh menyekat semua gelombang radio selamanya.",
-          ],
-          correct: 1,
-          feedbackCorrect:
-            "Betul! Kerana Marikh sangat jauh, mesej radio ambil masa ~14 minit sehala!",
-          feedbackWrong:
-            "Hampir! Marikh berjuta-juta kilometer jauhnya, jadi mesej radio ambil masa ~14 minit untuk sampai!",
-        },
-        {
-          q: "Mengapa angkasawan perlu mencuci tanah Marikh sebelum menanam kentang angkasa?",
-          options: [
-            "Untuk membuang garam semula jadi bernama perklorat yang merosakkan tumbuhan",
-            "Untuk menjadikan tanah kelihatan lebih cantik",
-            "Kerana tanah Marikh terlalu basah",
+            "Amaran ribut suria supaya kru dapat menguatkan perisai radiasi tepat pada masanya",
+            "Bila kentang angkasa sedia untuk dituai",
+            "Kelajuan pusingan tayar rover",
+            "Ribut hujan dan pasang surut laut di Bumi",
           ],
           correct: 0,
           feedbackCorrect:
-            "Cemerlang! Mencuci garam perklorat menjadikan tanah Marikh selamat untuk tanaman sihat!",
+            "Hebat! DONKI menjejak ribut suria supaya kru dapat melindungi pangkalan dengan perisai!",
           feedbackWrong:
-            "Sikit lagi! Tanah Marikh ada garam semula jadi bernama perklorat yang mesti dicuci dahulu.",
+            "DONKI menjejak ribut suria dari Matahari supaya kru dapat menguatkan perisai radiasi!",
+        },
+        {
+          q: "Mengapakah membersihkan debu pada panel suria menggunakan Oksigen dan Makanan?",
+          options: [
+            "Panel suria makan snek untuk hasilkan elektrik",
+            "Bekerja di luar dalam sut angkasa guna oksigen dan tenaga makanan untuk memulihkan Tenaga",
+            "Debu bertukar menjadi makanan apabila diberus",
+            "Membersihkan panel suria menutup cahaya matahari",
+          ],
+          correct: 1,
+          feedbackCorrect:
+            "Cemerlang! Kerja luar menggunakan oksigen sut dan tenaga makanan sebagai pertukaran untuk mengecas bateri!",
+          feedbackWrong:
+            "Kerja luar dalam sut angkasa menggunakan oksigen dan makanan untuk memulihkan Tenaga bateri!",
         },
       ],
     },
+    leaderboard: {
+      title: "Papan Pendahulu Komander Pangkalan Bulan",
+      subtitle: "Bandingkan prestasi 6-Hari anda dengan Komander terbaik!",
+      totalScoreLabel: "Jumlah Skor Misi",
+      breakdown: {
+        resources: "Baki Sumber",
+        tasks: "Tugasan Selesai",
+        quiz: "Ketepatan Kuiz",
+        timeBonus: "Bonus Masa",
+      },
+      enterNameLabel: "Simpan Nama Panggilan Komander:",
+      namePlaceholder: "cth., Kmdr. Zara",
+      saveBtn: "Simpan Skor",
+      savedBadge: "Disimpan ke Papan Pendahulu!",
+      rankCol: "Kedudukan",
+      nameCol: "Komander",
+      tasksCol: "Tugasan",
+      quizCol: "Kuiz",
+      scoreCol: "Skor",
+      certificateBtn: "Lihat & Muat Turun Sijil",
+      playAgainBtn: "Main Semula",
+    },
     certificate: {
-      heading: "Sijil Rasmi Kadet Marikh",
+      heading: "Sijil Rasmi Komander Pangkalan Angkasa",
       presentedTo: "Dengan Bangganya Dianugerahkan Kepada",
-      namePlaceholder: "Masukkan Nama Kadet...",
-      defaultName: "Kadet Angkasa",
+      namePlaceholder: "Masukkan Nama Komander...",
+      defaultName: "Komander Angkasa",
       completedLine:
-        "Kerana berjaya mengharungi 6 Sol di Kawah Jezero, Marikh!",
+        "Kerana berjaya menguruskan sumber selama 6 Hari di Pangkalan Bulan & Marikh!",
       finalStats: "Status Akhir Pangkalan",
       badgeLabel: "Pangkat Kepakaran",
       badges: {
@@ -410,24 +637,25 @@ export const TRANSLATIONS = {
       },
       printBtn: "Cetak / Simpan PDF",
       downloadBtn: "Muat Turun PNG",
+      backToLeaderboard: "Kembali ke Papan Pendahulu",
       playAgainBtn: "Main Semula",
     },
     nasaModal: {
       title: "Sains & Data NASA",
       intro:
-        "Jezero 6: Misi Marikh diinspirasikan oleh misi Marikh NASA sebenar dan set data sains terbuka untuk penjelajah muda:",
+        "Misi ini diinspirasikan oleh sistem penerokaan angkasa NASA sebenar dan set data sains terbuka untuk pelajar:",
       items: [
         {
-          name: "Rover Perseverance NASA (MOXIE & MEDA)",
-          desc: "MOXIE membuktikan penghasilan oksigen daripada CO₂ Marikh, manakala MEDA mengukur cuaca, debu, dan suhu beku Marikh.",
+          name: "Pangkalan Bulan Artemis NASA & Perseverance (MOXIE / MEDA)",
+          desc: "Penggunaan sumber tempatan (ISRU) mengekstrak oksigen daripada regolit bulan dan CO₂ Marikh.",
         },
         {
           name: "Pangkalan Data Cuaca Angkasa DONKI NASA",
-          desc: "Menjejak suar suria dan ribut angkasa supaya angkasawan tahu bila perlu menguatkan perisai radiasi.",
+          desc: "Menjejak suar suria supaya kru dapat menguatkan perisai radiasi sebelum ribut tiba.",
         },
         {
           name: "Repositori Data Sains Terbuka NASA (OSDR)",
-          desc: "Berkongsi eksperimen bio-angkasa sebenar—seperti menanam alga dan tumbuhan di angkasa—bersama saintis dan pelajar seluruh dunia.",
+          desc: "Berkongsi eksperimen biologi angkasa—seperti menanam mikroalga dan tanaman hidroponik.",
         },
       ],
     },
