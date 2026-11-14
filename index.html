@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interstellar V — Open World Draft</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Minimalist HUD -->
+    <div id="hud">
+      <div class="hud-top-left">
+        <div class="hud-title">INTERSTELLAR V</div>
+        <div class="hud-stats">
+          <span id="beacon-count">Beacons: 0 / 8</span>
+          <span class="divider">•</span>
+          <span id="coords">0, 0</span>
+        </div>
+      </div>
+
+      <div class="hud-top-right">
+        <div id="speed-display">0 m/s</div>
+      </div>
+
+      <div class="hud-bottom">
+        <div class="controls-hint">
+          <span><kbd>WASD</kbd> Move</span>
+          <span><kbd>Shift</kbd> Boost</span>
+          <span><kbd>Space</kbd> Jump</span>
+          <span><kbd>Mouse</kbd> Look</span>
+          <span><kbd>Esc</kbd> Pause</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Start / Pause Overlay -->
+    <div id="overlay" class="overlay">
+      <div class="overlay-card">
+        <h1>INTERSTELLAR V</h1>
+        <p id="overlay-subtitle">
+          Explore the frontier and activate all 8 energy beacons.
+        </p>
+        <button id="play-btn" type="button">Click to Explore</button>
+      </div>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
